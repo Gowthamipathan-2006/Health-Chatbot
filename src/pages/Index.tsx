@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import SignInDialog from "@/components/auth/SignInDialog";
+import SignUpDialog from "@/components/auth/SignUpDialog";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,12 +46,16 @@ const Index = () => {
           </div>
           
           <div className="flex items-center space-x-3">
-            <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
-              Sign In
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              Sign Up
-            </Button>
+            <SignInDialog>
+              <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                Sign In
+              </Button>
+            </SignInDialog>
+            <SignUpDialog>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Sign Up
+              </Button>
+            </SignUpDialog>
           </div>
         </div>
       </header>
@@ -94,10 +99,8 @@ const Index = () => {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          {/* Main Content Area */}
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="w-full max-w-4xl">
-              {/* Main Heading */}
               <div className="text-center mb-12">
                 <h1 className="text-6xl font-bold text-gray-900 mb-4">
                   HEALTH <span className="text-blue-600">CHATBOT</span>
@@ -108,7 +111,6 @@ const Index = () => {
                 </p>
               </div>
 
-              {/* Main Search Bar */}
               <div className="relative mb-8">
                 <div className="flex items-center space-x-4">
                   <div className="relative flex-1">
@@ -130,7 +132,6 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Quick Suggestions */}
               <div className="text-center">
                 <p className="text-gray-500 mb-4">Try asking about:</p>
                 <div className="flex flex-wrap justify-center gap-3">
@@ -154,7 +155,6 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Health Disclaimer */}
               <div className="mt-12 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800 text-center">
                   <strong>Disclaimer:</strong> This chatbot provides general health information and is not a substitute for professional medical advice. 
