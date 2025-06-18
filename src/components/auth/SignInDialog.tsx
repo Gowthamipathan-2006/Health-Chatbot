@@ -21,6 +21,12 @@ const SignInDialog = ({ children }: SignInDialogProps) => {
     setOpen(false);
   };
 
+  const handleForgotPassword = () => {
+    console.log("Forgot password for:", email);
+    // Here you would integrate with your password recovery service
+    alert("Password recovery email sent! (This is a demo - check console for details)");
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -56,6 +62,15 @@ const SignInDialog = ({ children }: SignInDialogProps) => {
               required
               className="border-blue-200 focus:border-blue-400"
             />
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Forgot Password?
+              </button>
+            </div>
           </div>
           <Button 
             type="submit" 
