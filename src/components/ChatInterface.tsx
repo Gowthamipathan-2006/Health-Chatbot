@@ -29,7 +29,7 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const GEMINI_API_KEY = "AIzaSyBxBEkNhILAJCKe28gZTnz7QKufYux1jME";
-  const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=GEMINI_API_KEY`;
+  const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
   useEffect(() => {
     const fetchModels = async () => {
