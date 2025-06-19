@@ -183,20 +183,6 @@ const Index = () => {
               </Button>
             </SignUpDialog>
           </div>
-          <div className="mt-8 flex justify-center space-x-4">
-            <div className="w-16 h-16 rounded-full border-2 border-yellow-300 shadow bg-yellow-100 flex items-center justify-center overflow-hidden">
-              <img src={pikachuUrl} alt="Pikachu" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display='none'} />
-              <span className="font-bold text-blue-900 absolute">Pikachu</span>
-            </div>
-            <div className="w-16 h-16 rounded-full border-2 border-yellow-300 shadow bg-yellow-100 flex items-center justify-center overflow-hidden">
-              <img src={spongebobUrl} alt="SpongeBob" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display='none'} />
-              <span className="font-bold text-blue-900 absolute">SpongeBob</span>
-            </div>
-            <div className="w-16 h-16 rounded-full border-2 border-blue-300 shadow bg-blue-100 flex items-center justify-center overflow-hidden">
-              <img src={popeyeUrl} alt="Popeye" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display='none'} />
-              <span className="font-bold text-blue-900 absolute">Popeye</span>
-            </div>
-          </div>
         </div>
       </div>
     );

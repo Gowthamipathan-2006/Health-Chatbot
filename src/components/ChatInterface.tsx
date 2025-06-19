@@ -158,12 +158,19 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
   const mascotAvatar = '/images/shinchan.png';
   const robotAvatar = '/images/robot.png';
 
+  // For Shinchan thinking messages
+  const shinchanThinkingMessages = [
+    "Wait karo, answer aah raha hai ",
+    "Mai hu naa, answer bejatha hu"
+  ];
+  function getRandomThinkingMessage() {
+    return shinchanThinkingMessages[Math.floor(Math.random() * shinchanThinkingMessages.length)];
+  }
+
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 relative">
       {/* Shinchan mascot in the corner */}
       <img src={mascotAvatar} alt="Shinchan" className="w-20 h-20 absolute left-4 bottom-4 opacity-80 z-0" />
-      {/* Robot mascot floating */}
-      <img src={robotAvatar} alt="Robot" className="w-16 h-16 absolute right-8 top-1/2 opacity-70 z-0 animate-bounce" />
       <ScrollArea className="flex-1 p-4 relative z-10">
         <div className="space-y-4">
           {messages.map((message) => {
@@ -201,16 +208,10 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
             );
           })}
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="max-w-[80%] bg-white border-blue-200 rounded-3xl shadow-md">
-                <div className="p-4 flex items-center space-x-2">
-                  <img src={botAvatar} alt="Bot" className="w-8 h-8 rounded-full border-2 border-blue-300 shadow bg-white object-cover" />
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                  </div>
-                </div>
+            <div className="flex justify-start items-center space-x-4">
+              <img src={mascotAvatar} alt="Shinchan" className="w-14 h-14 rounded-full border-2 border-pink-300 shadow bg-white object-cover" />
+              <div className="bg-pink-100 rounded-xl p-4 font-bold text-pink-700 text-lg animate-pulse">
+                {getRandomThinkingMessage()}
               </div>
             </div>
           )}
