@@ -169,8 +169,6 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 relative">
-      {/* Shinchan mascot in the corner */}
-      <img src={mascotAvatar} alt="Shinchan" className="w-20 h-20 absolute left-4 bottom-4 opacity-80 z-0" />
       <ScrollArea className="flex-1 p-4 relative z-10">
         <div className="space-y-4">
           {messages.map((message) => {
