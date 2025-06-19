@@ -44,6 +44,11 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     fetchModels();
   }, []);
 
+  // Helper to detect Telugu input
+  function isTelugu(text: string) {
+    return /[\u0C00-\u0C7F]/.test(text);
+  }
+
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
@@ -59,15 +64,22 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     setIsLoading(true);
 
     try {
-      console.log('Sending message to Gemini API:', inputMessage);
-
+      const isTeluguInput = isTelugu(inputMessage);
+      let promptInstruction =
+        "You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended.\n\nSymptoms/Question: ";
+      if (isTeluguInput) {
+        promptInstruction =
+          "You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended. Respond in Telugu.\n\nSymptoms/Question: ";
+      }
       const requestBody = {
         contents: [{
           parts: [{
-            text: `You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended.\n\nSymptoms/Question: ${inputMessage}\n\nPlease structure your response with:\n1. Possible conditions (general information)\n2. General care recommendations\n3. When to seek immediate medical attention\n4. Disclaimer about consulting healthcare professionals`
+            text: `${promptInstruction}${inputMessage}\n\nPlease structure your response with:\n1. Possible conditions (general information)\n2. General care recommendations\n3. When to seek immediate medical attention\n4. Disclaimer about consulting healthcare professionals`
           }]
         }]
       };
+
+      console.log('Sending message to Gemini API:', inputMessage);
 
       const response = await fetch(GEMINI_API_URL, {
         method: 'POST',
