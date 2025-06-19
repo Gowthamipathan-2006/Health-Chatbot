@@ -190,6 +190,25 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-pink-200 via-blue-100 to-yellow-100" style={{ fontFamily: 'Baloo 2, cursive' }}>
+      <div className="absolute top-6 right-8 z-50">
+        <div className="relative group">
+          <Avatar className="w-12 h-12 cursor-pointer border-2 border-blue-400 shadow-lg">
+            <AvatarFallback>{user.user_metadata?.name?.[0] || user.email[0]}</AvatarFallback>
+          </Avatar>
+          <div className="absolute right-0 mt-2 w-56 bg-white border rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+            <div className="p-4 border-b">
+              <div className="font-semibold">{user.user_metadata?.name || user.email}</div>
+              <div className="text-xs text-gray-500">{user.email}</div>
+            </div>
+            <button
+              className="w-full text-left px-4 py-2 text-sm hover:bg-blue-50"
+              onClick={async () => { await supabase.auth.signOut(); setUser(null); }}
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+      </div>
       <div className="w-full max-w-4xl mx-auto p-8 rounded-3xl shadow-2xl bg-white/80 border-4 border-blue-200 flex flex-col items-center">
         <h1 className="text-6xl font-extrabold text-blue-600 mb-4 text-center" style={{ fontFamily: 'Baloo 2, cursive' }}>
           HEALTH <span className="text-pink-400">CHATBOT</span>
