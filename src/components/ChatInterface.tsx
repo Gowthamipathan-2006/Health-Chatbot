@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Send, Bot, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,19 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
 
   const GEMINI_API_KEY = "AIzaSyDP6Lk43FJNVoMEIRW1TH7jn03lYaTFNLA";
   const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${GEMINI_API_KEY}`);
+        const data = await response.json();
+        console.log("Available Gemini models:", data);
+      } catch (err) {
+        console.error("Error fetching Gemini models:", err);
+      }
+    };
+    fetchModels();
+  }, []);
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
