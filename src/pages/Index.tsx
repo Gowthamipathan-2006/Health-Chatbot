@@ -10,7 +10,6 @@ import ApiKeyManager from "@/components/ApiKeyManager";
 import ChatInterface from "@/components/ChatInterface";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import "https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
