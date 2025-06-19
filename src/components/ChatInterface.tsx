@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   id: string;
@@ -29,6 +28,9 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const GEMINI_API_KEY = "AIzaSyDP6Lk43FJNVoMEIRW1TH7jn03lYaTFNLA";
+  const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
@@ -44,18 +46,31 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     setIsLoading(true);
 
     try {
-      console.log('Sending message to backend:', inputMessage);
+      console.log('Sending message to Gemini API:', inputMessage);
 
-      const { data, error } = await supabase.functions.invoke('health-chat', {
-        body: { message: inputMessage }
+      const requestBody = {
+        contents: [{
+          parts: [{
+            text: `You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended.\n\nSymptoms/Question: ${inputMessage}\n\nPlease structure your response with:\n1. Possible conditions (general information)\n2. General care recommendations\n3. When to seek immediate medical attention\n4. Disclaimer about consulting healthcare professionals`
+          }]
+        }]
+      };
+
+      const response = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
       });
 
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw new Error(error.message || 'Failed to get response from health assistant');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error: ${response.status} - ${errorText}`);
       }
 
-      const aiResponse = data?.response || data?.error || "I'm sorry, I couldn't process your request. Please try again.";
+      const data = await response.json();
+      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || data?.error?.message || "I'm sorry, I couldn't process your request. Please try again.";
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -66,14 +81,11 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
 
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
-      console.error('Error calling health chat function:', error);
-      
+      console.error('Error calling Gemini API:', error);
       let errorMessage = "I'm sorry, there was an error processing your request.";
-      
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         content: errorMessage,
