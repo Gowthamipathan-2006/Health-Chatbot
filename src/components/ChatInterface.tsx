@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import "https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap";
 
 interface Message {
   id: string;
@@ -120,7 +119,7 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50" style={{ fontFamily: 'Baloo 2, cursive' }}>
+    <div className="flex flex-col h-full bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
       <ScrollArea className="flex-1 p-4 relative">
         <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/doraemon.png" alt="Doraemon" className="w-20 h-20 absolute top-4 right-4 opacity-80 z-0" />
         <div className="space-y-4 z-10 relative">
@@ -140,7 +139,7 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
                 }`}>
                   <CardContent className="p-4">
                     <div className="flex flex-col">
-                      <p className="text-base whitespace-pre-wrap" style={{ fontFamily: 'Baloo 2, cursive' }}>{message.content}</p>
+                      <p className="text-base whitespace-pre-wrap">{message.content}</p>
                       <p className="text-xs mt-1 opacity-70 text-right">{message.timestamp.toLocaleTimeString()}</p>
                     </div>
                   </CardContent>
@@ -178,7 +177,6 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
             placeholder="Describe your symptoms..."
             className="flex-1 border-blue-200 focus:border-blue-400 rounded-full px-6 py-3 text-lg bg-yellow-50 shadow"
             disabled={isLoading}
-            style={{ fontFamily: 'Baloo 2, cursive' }}
           />
           <Button
             onClick={sendMessage}
