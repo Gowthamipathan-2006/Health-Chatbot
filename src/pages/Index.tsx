@@ -1,16 +1,20 @@
 
 import { useState } from "react";
-import { Search, History } from "lucide-react";
+import { Search, History, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SignInDialog from "@/components/auth/SignInDialog";
 import SignUpDialog from "@/components/auth/SignUpDialog";
+import ApiKeyManager from "@/components/ApiKeyManager";
+import ChatInterface from "@/components/ChatInterface";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [historySearchQuery, setHistorySearchQuery] = useState("");
+  const [showChat, setShowChat] = useState(false);
+  const [apiKey, setApiKey] = useState("");
   
   // Mock history data
   const chatHistory = [
@@ -29,9 +33,94 @@ const Index = () => {
   const handleMainSearch = () => {
     if (searchQuery.trim()) {
       console.log("Searching for:", searchQuery);
-      // This would integrate with your chatbot API
+      setShowChat(true);
     }
   };
+
+  const handleStartChat = () => {
+    setShowChat(true);
+  };
+
+  if (showChat && apiKey) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b border-blue-100">
+          <div className="w-full px-6 py-4 flex justify-between items-center">
+            <div className="flex items-center space-x-4">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">H</span>
+              </div>
+              <span className="text-xl font-semibold text-gray-900">HealthBot</span>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowChat(false)}
+                className="border-blue-200 text-blue-700 hover:bg-blue-50"
+              >
+                Back to Home
+              </Button>
+              <SignInDialog>
+                <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                  Sign In
+                </Button>
+              </SignInDialog>
+              <SignUpDialog>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Sign Up
+                </Button>
+              </SignUpDialog>
+            </div>
+          </div>
+        </header>
+
+        <div className="flex w-full h-[calc(100vh-80px)]">
+          {/* History Sidebar */}
+          <div className="w-80 bg-white border-r border-blue-100 shadow-sm">
+            <div className="p-4 border-b border-blue-100">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search history..."
+                  value={historySearchQuery}
+                  onChange={(e) => setHistorySearchQuery(e.target.value)}
+                  className="pl-10 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+            
+            <div className="p-4">
+              <div className="flex items-center space-x-2 mb-4">
+                <History className="h-5 w-5 text-blue-600" />
+                <h3 className="font-semibold text-gray-900">Chat History</h3>
+              </div>
+              
+              <ScrollArea className="h-[calc(100vh-250px)]">
+                <div className="space-y-2">
+                  {filteredHistory.map((item) => (
+                    <Card key={item.id} className="cursor-pointer hover:shadow-md transition-all duration-200 border-blue-100 hover:border-blue-300">
+                      <CardContent className="p-3">
+                        <h4 className="font-medium text-gray-900 text-sm mb-1">{item.title}</h4>
+                        <p className="text-xs text-gray-500 mb-2">{item.date}</p>
+                        <p className="text-xs text-gray-600 line-clamp-2">{item.preview}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+          </div>
+
+          {/* Chat Interface */}
+          <div className="flex-1">
+            <ChatInterface apiKey={apiKey} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -111,6 +200,8 @@ const Index = () => {
                 </p>
               </div>
 
+              <ApiKeyManager onApiKeySet={setApiKey} />
+
               <div className="relative mb-8">
                 <div className="flex items-center space-x-4">
                   <div className="relative flex-1">
@@ -125,11 +216,23 @@ const Index = () => {
                   </div>
                   <Button
                     onClick={handleMainSearch}
+                    disabled={!apiKey}
                     className="px-8 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm"
                   >
                     Ask HealthBot
                   </Button>
                 </div>
+              </div>
+
+              <div className="text-center mb-8">
+                <Button
+                  onClick={handleStartChat}
+                  disabled={!apiKey}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg rounded-xl shadow-sm"
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  Start Chat with HealthBot
+                </Button>
               </div>
 
               <div className="text-center">
