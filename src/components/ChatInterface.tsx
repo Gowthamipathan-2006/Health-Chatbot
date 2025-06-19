@@ -118,57 +118,105 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     }
   };
 
+  // Helper to render bold text between **
+  function renderBold(text: string) {
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="font-extrabold text-blue-700">{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
+  }
+
+  // Helper to parse AI response into sections
+  function parseAIResponse(response: string) {
+    // Try to split by numbered sections
+    const sections = {
+      conditions: '',
+      care: '',
+      attention: '',
+      disclaimer: ''
+    };
+    const regex = /1\.[\s\S]*?2\.|2\.[\s\S]*?3\.|3\.[\s\S]*?4\.|4\.[\s\S]*/g;
+    const matches = response.match(regex);
+    if (matches) {
+      if (matches[0]) sections.conditions = matches[0].replace(/1\./, '').replace(/2\.$/, '').trim();
+      if (matches[1]) sections.care = matches[1].replace(/2\./, '').replace(/3\.$/, '').trim();
+      if (matches[2]) sections.attention = matches[2].replace(/3\./, '').replace(/4\.$/, '').trim();
+      if (matches[3]) sections.disclaimer = matches[3].replace(/4\./, '').trim();
+    } else {
+      // fallback: return all as disclaimer
+      sections.disclaimer = response;
+    }
+    return sections;
+  }
+
+  const userGender = (typeof apiKey === 'object' && apiKey.gender) ? apiKey.gender : 'male';
+  const userAvatar = userGender === 'female' ? '/images/female.png' : '/images/male.png';
+  const botAvatar = '/images/doraemon.png';
+  const mascotAvatar = '/images/shinchan.png';
+  const robotAvatar = '/images/robot.png';
+
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
-      <ScrollArea className="flex-1 p-4 relative">
-        <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/doraemon.png" alt="Doraemon" className="w-20 h-20 absolute top-4 right-4 opacity-80 z-0" />
-        <div className="space-y-4 z-10 relative">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className="flex items-end space-x-2">
-                {!message.isUser && (
-                  <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/doraemon.png" alt="Bot" className="w-10 h-10 rounded-full border-2 border-blue-300 shadow" />
-                )}
-                <Card className={`max-w-[80%] rounded-3xl shadow-md ${
-                  message.isUser 
-                    ? 'bg-yellow-200 text-blue-900 border-yellow-300' 
-                    : 'bg-white border-blue-200'
-                }`}>
-                  <CardContent className="p-4">
-                    <div className="flex flex-col">
-                      <p className="text-base whitespace-pre-wrap">{message.content}</p>
+    <div className="flex flex-col h-full bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 relative">
+      {/* Shinchan mascot in the corner */}
+      <img src={mascotAvatar} alt="Shinchan" className="w-20 h-20 absolute left-4 bottom-4 opacity-80 z-0" />
+      {/* Robot mascot floating */}
+      <img src={robotAvatar} alt="Robot" className="w-16 h-16 absolute right-8 top-1/2 opacity-70 z-0 animate-bounce" />
+      <ScrollArea className="flex-1 p-4 relative z-10">
+        <div className="space-y-4">
+          {messages.map((message) => {
+            // If bot, try to parse and structure the response
+            const isBot = !message.isUser;
+            let structured = null;
+            if (isBot) {
+              const sections = parseAIResponse(message.content);
+              structured = (
+                <div className="space-y-3">
+                  {sections.conditions && <div className="bg-blue-100 rounded-xl p-3"><span className="font-bold text-blue-700">Possible Conditions:</span> {renderBold(sections.conditions)}</div>}
+                  {sections.care && <div className="bg-yellow-100 rounded-xl p-3"><span className="font-bold text-yellow-700">Care Recommendations:</span> {renderBold(sections.care)}</div>}
+                  {sections.attention && <div className="bg-pink-100 rounded-xl p-3"><span className="font-bold text-pink-700">When to Seek Medical Attention:</span> {renderBold(sections.attention)}</div>}
+                  {sections.disclaimer && <div className="bg-gray-100 rounded-xl p-3"><span className="font-bold text-gray-700">Disclaimer:</span> {renderBold(sections.disclaimer)}</div>}
+                </div>
+              );
+            }
+            return (
+              <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                <div className="flex items-end space-x-2">
+                  {!message.isUser && (
+                    <img src={botAvatar} alt="Bot" className="w-10 h-10 rounded-full border-2 border-blue-300 shadow bg-white object-cover" />
+                  )}
+                  <div className={`max-w-[80%] rounded-3xl shadow-md ${message.isUser ? 'bg-yellow-200 text-blue-900 border-yellow-300' : 'bg-white border-blue-200'}`}>
+                    <div className="p-4">
+                      {isBot && structured ? structured : <p className="text-base whitespace-pre-wrap">{renderBold(message.content)}</p>}
                       <p className="text-xs mt-1 opacity-70 text-right">{message.timestamp.toLocaleTimeString()}</p>
                     </div>
-                  </CardContent>
-                </Card>
-                {message.isUser && (
-                  <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/pikachu.png" alt="User" className="w-10 h-10 rounded-full border-2 border-yellow-300 shadow" />
-                )}
+                  </div>
+                  {message.isUser && (
+                    <img src={userAvatar} alt="User" className="w-10 h-10 rounded-full border-2 border-yellow-300 shadow bg-white object-cover" />
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {isLoading && (
             <div className="flex justify-start">
-              <Card className="max-w-[80%] bg-white border-blue-200 rounded-3xl shadow-md">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/doraemon.png" alt="Bot" className="w-8 h-8 rounded-full border-2 border-blue-300 shadow" />
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                    </div>
+              <div className="max-w-[80%] bg-white border-blue-200 rounded-3xl shadow-md">
+                <div className="p-4 flex items-center space-x-2">
+                  <img src={botAvatar} alt="Bot" className="w-8 h-8 rounded-full border-2 border-blue-300 shadow bg-white object-cover" />
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           )}
         </div>
       </ScrollArea>
-      <div className="border-t border-blue-200 p-4 bg-white/80 rounded-b-3xl shadow-inner">
+      <div className="border-t border-blue-200 p-4 bg-white/80 rounded-b-3xl shadow-inner z-10">
         <div className="flex space-x-2">
           <Input
             value={inputMessage}
@@ -183,7 +231,7 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
             disabled={isLoading || !inputMessage.trim()}
             className="bg-yellow-300 hover:bg-yellow-400 text-blue-900 rounded-full px-6 py-3 text-lg font-bold shadow-md flex items-center justify-center"
           >
-            <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/pikachu.png" alt="Send" className="w-6 h-6 mr-2" />
+            <img src={userAvatar} alt="Send" className="w-6 h-6 mr-2" />
             Send
           </Button>
         </div>
