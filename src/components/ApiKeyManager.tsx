@@ -17,10 +17,11 @@ const ApiKeyManager = ({ onApiKeySet }: ApiKeyManagerProps) => {
 
   useEffect(() => {
     const storedApiKey = localStorage.getItem('gemini_api_key');
-    if (storedApiKey) {
+    if (storedApiKey && storedApiKey.trim() && storedApiKey.startsWith('AIza')) {
       setApiKey(storedApiKey);
       setIsStored(true);
       onApiKeySet(storedApiKey);
+      console.log('Loaded API key from localStorage');
     } else {
       // Use the provided API key as default
       const defaultApiKey = "AIzaSyDPa2sH5zVIsx4TSUYssbBEI93Wvjh3ERY";
@@ -28,14 +29,19 @@ const ApiKeyManager = ({ onApiKeySet }: ApiKeyManagerProps) => {
       localStorage.setItem('gemini_api_key', defaultApiKey);
       setIsStored(true);
       onApiKeySet(defaultApiKey);
+      console.log('Set default API key');
     }
   }, [onApiKeySet]);
 
   const handleSaveApiKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('gemini_api_key', apiKey);
+    const trimmedKey = apiKey.trim();
+    if (trimmedKey && trimmedKey.startsWith('AIza')) {
+      localStorage.setItem('gemini_api_key', trimmedKey);
       setIsStored(true);
-      onApiKeySet(apiKey);
+      onApiKeySet(trimmedKey);
+      console.log('API key saved successfully');
+    } else {
+      alert('Please enter a valid Google API key (should start with "AIza")');
     }
   };
 
@@ -43,6 +49,7 @@ const ApiKeyManager = ({ onApiKeySet }: ApiKeyManagerProps) => {
     localStorage.removeItem('gemini_api_key');
     setApiKey("");
     setIsStored(false);
+    console.log('API key cleared');
   };
 
   if (isStored) {
@@ -53,6 +60,7 @@ const ApiKeyManager = ({ onApiKeySet }: ApiKeyManagerProps) => {
             <div className="flex items-center space-x-2">
               <Key className="h-4 w-4 text-green-600" />
               <span className="text-sm text-green-800">API Key configured</span>
+              <span className="text-xs text-gray-600">({apiKey.substring(0, 8)}...)</span>
             </div>
             <Button
               variant="outline"
@@ -85,7 +93,7 @@ const ApiKeyManager = ({ onApiKeySet }: ApiKeyManagerProps) => {
               type={showApiKey ? "text" : "password"}
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your Google Gemini API key"
+              placeholder="Enter your Google Gemini API key (AIza...)"
               className="pr-10 border-blue-200 focus:border-blue-400"
             />
             <Button
@@ -112,7 +120,7 @@ const ApiKeyManager = ({ onApiKeySet }: ApiKeyManagerProps) => {
         </Button>
         <div className="text-xs text-gray-600 bg-yellow-50 p-3 rounded border border-yellow-200">
           <strong>Note:</strong> Your API key will be stored locally in your browser for convenience. 
-          For production applications, consider using a backend service for secure API key management.
+          Make sure to enter a valid Google Gemini API key that starts with "AIza".
         </div>
       </CardContent>
     </Card>
