@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Send, Bot, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,7 +55,7 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
         throw new Error(error.message || 'Failed to get response from health assistant');
       }
 
-      const aiResponse = data?.response || "I'm sorry, I couldn't process your request. Please try again.";
+      const aiResponse = data?.response || data?.error || "I'm sorry, I couldn't process your request. Please try again.";
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
