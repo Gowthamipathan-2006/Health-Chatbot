@@ -11,8 +11,8 @@ import ChatInterface from "@/components/ChatInterface";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-// Doraemon SVG from unpkg
-const doraemonUrl = "https://unpkg.com/@iconify/icons-logos/doraemon.svg";
+// Doraemon SVG or PNG for login page
+const doraemonUrl = "/images/doraemon.png";
 const pikachuUrl = "https://unpkg.com/@iconify/icons-logos/pikachu.svg";
 const spongebobUrl = "https://unpkg.com/@iconify/icons-logos/spongebob.svg";
 const popeyeUrl = "https://unpkg.com/@iconify/icons-logos/popeye.svg";
@@ -164,10 +164,10 @@ const Index = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-pink-100 via-blue-100 to-yellow-100" style={{ fontFamily: 'Baloo 2, cursive' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-pink-200 via-blue-100 to-yellow-100" style={{ fontFamily: 'Baloo 2, cursive' }}>
         <div className="flex flex-col items-center p-8 rounded-3xl shadow-2xl bg-white/80 border-4 border-blue-200 max-w-md w-full">
-          <div className="w-24 h-24 mb-4 rounded-full border-4 border-pink-200 shadow-lg bg-pink-100 flex items-center justify-center overflow-hidden">
-            <img src={doraemonUrl} alt="Doraemon" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display='none'} />
+          <div className="w-32 h-32 mb-4 rounded-full border-4 border-pink-200 shadow-lg bg-pink-100 flex items-center justify-center overflow-hidden">
+            <img src={doraemonUrl} alt="Doraemon" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-4xl font-extrabold text-blue-600 mb-2" style={{ fontFamily: 'Baloo 2, cursive' }}>Welcome to HealthBot!</h1>
           <p className="text-lg text-gray-600 mb-6 text-center">Your cute AI health assistant. Please sign in or sign up to continue!</p>
@@ -189,171 +189,26 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-blue-100">
-        <div className="w-full px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">H</span>
-            </div>
-            <span className="text-xl font-semibold text-gray-900">HealthBot</span>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            {user ? (
-              <div className="relative group">
-                <Avatar className="w-9 h-9 cursor-pointer">
-                  <AvatarFallback>{user.user_metadata?.name?.[0] || user.email[0]}</AvatarFallback>
-                </Avatar>
-                <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                  <div className="p-4 border-b">
-                    <div className="font-semibold">{user.user_metadata?.name || user.email}</div>
-                    <div className="text-xs text-gray-500">{user.email}</div>
-                  </div>
-                  <button
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-blue-50"
-                    onClick={async () => { await supabase.auth.signOut(); setUser(null); }}
-                  >
-                    Log Out
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <SignInDialog onAuth={setUser}>
-                  <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
-                    Sign In
-                  </Button>
-                </SignInDialog>
-                <SignUpDialog onAuth={setUser}>
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    Sign Up
-                  </Button>
-                </SignUpDialog>
-              </>
-            )}
-          </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-pink-200 via-blue-100 to-yellow-100" style={{ fontFamily: 'Baloo 2, cursive' }}>
+      <div className="w-full max-w-4xl mx-auto p-8 rounded-3xl shadow-2xl bg-white/80 border-4 border-blue-200 flex flex-col items-center">
+        <h1 className="text-6xl font-extrabold text-blue-600 mb-4 text-center" style={{ fontFamily: 'Baloo 2, cursive' }}>
+          HEALTH <span className="text-pink-400">CHATBOT</span>
+        </h1>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8 text-center">
+          Your AI-powered health assistant. Ask questions about symptoms, treatments, wellness tips, and get reliable health information instantly.
+        </p>
+        <ApiKeyManager onApiKeySet={setApiKey} />
+        <div className="relative mb-8 w-full flex flex-col items-center">
+          <Button
+            onClick={handleMainSearch}
+            disabled={!apiKey}
+            className="px-8 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm mt-4"
+          >
+            Start Chat with HealthBot
+          </Button>
         </div>
-      </header>
-
-      <div className="flex w-full">
-        {/* History Sidebar */}
-        <div className="w-80 bg-white border-r border-blue-100 min-h-screen shadow-sm">
-          <div className="p-4 border-b border-blue-100">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search history..."
-                value={historySearchQuery}
-                onChange={(e) => setHistorySearchQuery(e.target.value)}
-                className="pl-10 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-              />
-            </div>
-          </div>
-          
-          <div className="p-4">
-            <div className="flex items-center space-x-2 mb-4">
-              <History className="h-5 w-5 text-blue-600" />
-              <h3 className="font-semibold text-gray-900">Chat History</h3>
-            </div>
-            
-            <ScrollArea className="h-[calc(100vh-200px)]">
-              <div className="space-y-2">
-                {filteredHistory.map((item) => (
-                  <Card key={item.id} className="cursor-pointer hover:shadow-md transition-all duration-200 border-blue-100 hover:border-blue-300">
-                    <CardContent className="p-3">
-                      <h4 className="font-medium text-gray-900 text-sm mb-1">{item.title}</h4>
-                      <p className="text-xs text-gray-500 mb-2">{item.date}</p>
-                      <p className="text-xs text-gray-600 line-clamp-2">{item.preview}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col">
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="w-full max-w-4xl">
-              <div className="text-center mb-12">
-                <h1 className="text-6xl font-bold text-gray-900 mb-4">
-                  HEALTH <span className="text-blue-600">CHATBOT</span>
-                </h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  Your AI-powered health assistant. Ask questions about symptoms, treatments, 
-                  wellness tips, and get reliable health information instantly.
-                </p>
-              </div>
-
-              <ApiKeyManager onApiKeySet={setApiKey} />
-
-              <div className="relative mb-8">
-                <div className="flex items-center space-x-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-6 w-6" />
-                    <Input
-                      placeholder="Ask me anything about your health..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleMainSearch()}
-                      className="pl-12 pr-4 py-6 text-lg border-2 border-blue-200 focus:border-blue-400 focus:ring-blue-400 rounded-xl shadow-sm"
-                    />
-                  </div>
-                  <Button
-                    onClick={handleMainSearch}
-                    disabled={!apiKey}
-                    className="px-8 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm"
-                  >
-                    Ask HealthBot
-                  </Button>
-                </div>
-              </div>
-
-              <div className="text-center mb-8">
-                <Button
-                  onClick={handleStartChat}
-                  disabled={!apiKey}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg rounded-xl shadow-sm"
-                >
-                  <MessageCircle className="h-5 w-5 mr-2" />
-                  Start Chat with HealthBot
-                </Button>
-              </div>
-
-              <div className="text-center">
-                <p className="text-gray-500 mb-4">Try asking about:</p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  {[
-                    "Common cold symptoms",
-                    "Healthy diet tips",
-                    "Exercise routines",
-                    "Sleep improvement",
-                    "Stress management",
-                    "Preventive care"
-                  ].map((suggestion) => (
-                    <Button
-                      key={suggestion}
-                      variant="outline"
-                      onClick={() => setSearchQuery(suggestion)}
-                      className="border-blue-200 text-blue-700 hover:bg-blue-50 rounded-full"
-                    >
-                      {suggestion}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-12 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800 text-center">
-                  <strong>Disclaimer:</strong> This chatbot provides general health information and is not a substitute for professional medical advice. 
-                  Always consult with a healthcare provider for medical concerns.
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="flex-1 w-full">
+          <ChatInterface apiKey={apiKey} />
         </div>
       </div>
     </div>
