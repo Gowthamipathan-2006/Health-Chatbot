@@ -63,6 +63,24 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     setInputMessage("");
     setIsLoading(true);
 
+    // Simple health-related keyword check
+    const healthKeywords = [
+      "symptom", "medicine", "health", "doctor", "pain", "fever", "cough", "cold", "flu", "injury", "treatment", "wellness", "diet", "exercise", "illness", "disease", "infection", "headache", "stomach", "body", "mental", "stress", "anxiety", "sleep", "nutrition", "fitness", "clinic", "hospital", "medical", "blood", "pressure", "diabetes", "asthma", "allergy", "skin", "rash", "wound", "fracture", "burn", "sick", "vomit", "nausea", "constipation", "diarrhea", "cancer", "therapy", "injury", "recovery", "healthcare", "doctor", "nurse", "medicine", "medication", "prescription", "pharmacy", "vaccine", "immunization", "checkup", "appointment", "surgery", "operation", "emergency", "ambulance", "first aid", "infection", "virus", "bacteria", "covid", "corona", "pandemic", "epidemic", "public health", "well-being", "wellbeing", "wellness", "prevention", "treatment", "remedy", "remedies", "disease", "disorder", "condition", "diagnosis", "prognosis", "therapy", "rehabilitation", "recovery", "symptoms", "signs", "risk", "factors", "complications", "side effects", "advice", "consultation", "specialist", "cardiology", "dermatology", "neurology", "orthopedic", "pediatric", "gynecology", "obstetrics", "urology", "oncology", "psychiatry", "psychology", "dentist", "dental", "oral", "vision", "eye", "hearing", "ear", "nose", "throat", "ENT", "lungs", "liver", "kidney", "heart", "brain", "muscle", "bone", "joint", "arthritis", "injury", "sprain", "strain", "bruise", "cut", "bleeding", "swelling", "infection", "inflammation", "immune", "system", "allergy", "allergic", "reaction", "asthma", "diabetes", "hypertension", "cholesterol", "obesity", "weight", "loss", "gain", "malnutrition", "dehydration", "hydration", "exercise", "workout", "fitness", "yoga", "meditation", "stress", "anxiety", "depression", "mental health", "counseling", "therapy", "support", "group", "addiction", "smoking", "alcohol", "substance", "abuse", "recovery", "rehab", "pregnancy", "prenatal", "postnatal", "childbirth", "baby", "infant", "child", "adolescent", "adult", "elderly", "senior", "geriatric", "women's health", "men's health", "sexual health", "reproductive health", "family planning", "contraception", "fertility", "menstruation", "period", "menopause", "andrology", "prostate", "testosterone", "estrogen", "hormone", "thyroid", "metabolism", "nutrition", "diet", "vitamin", "mineral", "supplement", "food", "allergy", "intolerance", "digestion", "digestive", "gastroenterology", "stomach", "intestine", "colon", "rectum", "liver", "gallbladder", "pancreas", "spleen", "urinary", "bladder", "kidney", "renal", "prostate", "testicle", "ovary", "uterus", "cervix", "vagina", "penis", "scrotum", "breast", "chest", "lung", "respiratory", "asthma", "bronchitis", "pneumonia", "tuberculosis", "covid", "corona", "flu", "cold", "allergy", "sinus", "throat", "tonsil", "ear", "hearing", "deaf", "blind", "vision", "eye", "cataract", "glaucoma", "retina", "cornea", "conjunctivitis", "pink eye", "skin", "rash", "eczema", "psoriasis", "acne", "pimple", "boil", "ulcer", "wound", "cut", "bruise", "burn", "scar", "hair", "nail", "dandruff", "bald", "alopecia", "cancer", "tumor", "lump", "swelling", "pain", "ache", "sore", "cramp", "spasm", "stiff", "weak", "paralysis", "numb", "tingle", "faint", "dizzy", "vertigo", "seizure", "convulsion", "fit", "stroke", "heart attack", "cardiac", "arrhythmia", "palpitation", "chest pain", "shortness of breath", "breathless", "cough", "wheeze"];
+    const inputLower = inputMessage.toLowerCase();
+    const isHealthRelated = healthKeywords.some(keyword => inputLower.includes(keyword));
+
+    if (!isHealthRelated) {
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "I'm here to help with health-related questions only. Please ask me about health, symptoms, wellness, or medical topics. Thank you for understanding!",
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const isTeluguInput = isTelugu(inputMessage);
       let promptInstruction =
