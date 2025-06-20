@@ -13,14 +13,55 @@ interface Message {
 }
 
 interface ChatInterfaceProps {
-  apiKey: string;
+  apiKey: string | { key: string; bot: string };
 }
 
+const botConfigs = {
+  health: {
+    initial: "Hello! I'm your AI health assistant. Please describe your symptoms and I'll help provide general health information. Remember, this is not a substitute for professional medical advice.",
+    prompt: (input: string, isTelugu: boolean) =>
+      (isTelugu
+        ? "You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended. Respond in Telugu.\n\nSymptoms/Question: "
+        : "You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended.\n\nSymptoms/Question: ") +
+      input +
+      "\n\nPlease structure your response with:\n1. Possible conditions (general information)\n2. General care recommendations\n3. When to seek immediate medical attention\n4. Disclaimer about consulting healthcare professionals"
+  },
+  study: {
+    initial: "Hi! I'm your Study Bot. Ask me any study-related question, and I'll help you learn and understand concepts.",
+    prompt: (input: string) =>
+      "You are a helpful AI study assistant. Please answer the following question with clear explanations, tips, and resources.\n\nQuestion: " +
+      input +
+      "\n\nPlease structure your response with:\n1. Explanation\n2. Key Points\n3. Study Tips\n4. Disclaimer about verifying with textbooks or teachers."
+  },
+  business: {
+    initial: "Hello! I'm your Business Bot. Ask me about business, entrepreneurship, or market trends.",
+    prompt: (input: string) =>
+      "You are a helpful AI business assistant. Please answer the following business-related question with insights, strategies, and practical advice.\n\nQuestion: " +
+      input +
+      "\n\nPlease structure your response with:\n1. Insights/Analysis\n2. Strategies/Recommendations\n3. Cautions/Considerations\n4. Disclaimer about consulting professionals."
+  },
+  scripts: {
+    initial: "Hi! I'm your Script Bot. Ask me to generate code, automation scripts, or creative writing.",
+    prompt: (input: string) =>
+      "You are a helpful AI script generator. Please generate a script or code for the following request, and explain the logic.\n\nRequest: " +
+      input +
+      "\n\nPlease structure your response with:\n1. Script/Code\n2. Explanation\n3. Usage Tips\n4. Disclaimer about reviewing and testing code."
+  }
+};
+
 const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
+  // Determine bot type and key
+  let botType = 'health';
+  let apiKeyValue = typeof apiKey === 'string' ? apiKey : apiKey?.key;
+  if (typeof apiKey === 'object' && apiKey.bot) {
+    botType = apiKey.bot;
+  }
+  const botConfig = botConfigs[botType] || botConfigs['health'];
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm your AI health assistant. Please describe your symptoms and I'll help provide general health information. Remember, this is not a substitute for professional medical advice.",
+      content: botConfig.initial,
       isUser: false,
       timestamp: new Date()
     }
@@ -28,7 +69,7 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const GEMINI_API_KEY = "AIzaSyBxBEkNhILAJCKe28gZTnz7QKufYux1jME";
+  const GEMINI_API_KEY = apiKeyValue || "AIzaSyBxBEkNhILAJCKe28gZTnz7QKufYux1jME";
   const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
   useEffect(() => {
@@ -63,36 +104,18 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     setInputMessage("");
     setIsLoading(true);
 
-    // Simple health-related keyword check
-    const healthKeywords = [
-      "symptom", "medicine", "health", "doctor", "pain", "fever", "cough", "cold", "flu", "injury", "treatment", "wellness", "diet", "exercise", "illness", "disease", "infection", "headache", "stomach", "body", "mental", "stress", "anxiety", "sleep", "nutrition", "fitness", "clinic", "hospital", "medical", "blood", "pressure", "diabetes", "asthma", "allergy", "skin", "rash", "wound", "fracture", "burn", "sick", "vomit", "nausea", "constipation", "diarrhea", "cancer", "therapy", "injury", "recovery", "healthcare", "doctor", "nurse", "medicine", "medication", "prescription", "pharmacy", "vaccine", "immunization", "checkup", "appointment", "surgery", "operation", "emergency", "ambulance", "first aid", "infection", "virus", "bacteria", "covid", "corona", "pandemic", "epidemic", "public health", "well-being", "wellbeing", "wellness", "prevention", "treatment", "remedy", "remedies", "disease", "disorder", "condition", "diagnosis", "prognosis", "therapy", "rehabilitation", "recovery", "symptoms", "signs", "risk", "factors", "complications", "side effects", "advice", "consultation", "specialist", "cardiology", "dermatology", "neurology", "orthopedic", "pediatric", "gynecology", "obstetrics", "urology", "oncology", "psychiatry", "psychology", "dentist", "dental", "oral", "vision", "eye", "hearing", "ear", "nose", "throat", "ENT", "lungs", "liver", "kidney", "heart", "brain", "muscle", "bone", "joint", "arthritis", "injury", "sprain", "strain", "bruise", "cut", "bleeding", "swelling", "infection", "inflammation", "immune", "system", "allergy", "allergic", "reaction", "asthma", "diabetes", "hypertension", "cholesterol", "obesity", "weight", "loss", "gain", "malnutrition", "dehydration", "hydration", "exercise", "workout", "fitness", "yoga", "meditation", "stress", "anxiety", "depression", "mental health", "counseling", "therapy", "support", "group", "addiction", "smoking", "alcohol", "substance", "abuse", "recovery", "rehab", "pregnancy", "prenatal", "postnatal", "childbirth", "baby", "infant", "child", "adolescent", "adult", "elderly", "senior", "geriatric", "women's health", "men's health", "sexual health", "reproductive health", "family planning", "contraception", "fertility", "menstruation", "period", "menopause", "andrology", "prostate", "testosterone", "estrogen", "hormone", "thyroid", "metabolism", "nutrition", "diet", "vitamin", "mineral", "supplement", "food", "allergy", "intolerance", "digestion", "digestive", "gastroenterology", "stomach", "intestine", "colon", "rectum", "liver", "gallbladder", "pancreas", "spleen", "urinary", "bladder", "kidney", "renal", "prostate", "testicle", "ovary", "uterus", "cervix", "vagina", "penis", "scrotum", "breast", "chest", "lung", "respiratory", "asthma", "bronchitis", "pneumonia", "tuberculosis", "covid", "corona", "flu", "cold", "allergy", "sinus", "throat", "tonsil", "ear", "hearing", "deaf", "blind", "vision", "eye", "cataract", "glaucoma", "retina", "cornea", "conjunctivitis", "pink eye", "skin", "rash", "eczema", "psoriasis", "acne", "pimple", "boil", "ulcer", "wound", "cut", "bruise", "burn", "scar", "hair", "nail", "dandruff", "bald", "alopecia", "cancer", "tumor", "lump", "swelling", "pain", "ache", "sore", "cramp", "spasm", "stiff", "weak", "paralysis", "numb", "tingle", "faint", "dizzy", "vertigo", "seizure", "convulsion", "fit", "stroke", "heart attack", "cardiac", "arrhythmia", "palpitation", "chest pain", "shortness of breath", "breathless", "cough", "wheeze"];
-    const inputLower = inputMessage.toLowerCase();
-    const isHealthRelated = healthKeywords.some(keyword => inputLower.includes(keyword));
-
-    if (!isHealthRelated) {
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "I'm here to help with health-related questions only. Please ask me about health, symptoms, wellness, or medical topics. Thank you for understanding!",
-        isUser: false,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botMessage]);
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      const isTeluguInput = isTelugu(inputMessage);
-      let promptInstruction =
-        "You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended.\n\nSymptoms/Question: ";
-      if (isTeluguInput) {
-        promptInstruction =
-          "You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended. Respond in Telugu.\n\nSymptoms/Question: ";
+      let promptText = "";
+      if (botType === 'health') {
+        const isTeluguInput = isTelugu(inputMessage);
+        promptText = botConfig.prompt(inputMessage, isTeluguInput);
+      } else {
+        promptText = botConfig.prompt(inputMessage);
       }
       const requestBody = {
         contents: [{
           parts: [{
-            text: `${promptInstruction}${inputMessage}\n\nPlease structure your response with:\n1. Possible conditions (general information)\n2. General care recommendations\n3. When to seek immediate medical attention\n4. Disclaimer about consulting healthcare professionals`
+            text: promptText
           }]
         }]
       };
@@ -201,7 +224,14 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     }
   }
 
-  const userGender = (typeof apiKey === 'object' && apiKey.gender) ? apiKey.gender : 'male';
+  // Helper to determine user avatar
+  let userGender = 'male';
+  if (typeof apiKey === 'string') {
+    // legacy: if apiKey is a string, try to extract gender if present (not used in new flow)
+    // userGender = ...
+  } else if (typeof apiKey === 'object' && 'gender' in apiKey) {
+    userGender = (apiKey as any).gender || 'male';
+  }
   const userAvatar = userGender === 'female' ? '/images/female.png' : '/images/male.png';
   const botAvatar = '/images/doraemon.png';
   const mascotAvatar = '/images/shinchan.png';
