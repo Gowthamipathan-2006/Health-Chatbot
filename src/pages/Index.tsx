@@ -11,6 +11,12 @@ import ChatInterface from "@/components/ChatInterface";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
+// Doraemon SVG from unpkg
+const doraemonUrl = "https://unpkg.com/@iconify/icons-logos/doraemon.svg";
+const pikachuUrl = "https://unpkg.com/@iconify/icons-logos/pikachu.svg";
+const spongebobUrl = "https://unpkg.com/@iconify/icons-logos/spongebob.svg";
+const popeyeUrl = "https://unpkg.com/@iconify/icons-logos/popeye.svg";
+
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [historySearchQuery, setHistorySearchQuery] = useState("");
@@ -160,7 +166,9 @@ const Index = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-pink-100 via-blue-100 to-yellow-100" style={{ fontFamily: 'Baloo 2, cursive' }}>
         <div className="flex flex-col items-center p-8 rounded-3xl shadow-2xl bg-white/80 border-4 border-blue-200 max-w-md w-full">
-          <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/doraemon.png" alt="Doraemon" className="w-24 h-24 mb-4 rounded-full border-4 border-pink-200 shadow-lg" />
+          <div className="w-24 h-24 mb-4 rounded-full border-4 border-pink-200 shadow-lg bg-pink-100 flex items-center justify-center overflow-hidden">
+            <img src={doraemonUrl} alt="Doraemon" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display='none'} />
+          </div>
           <h1 className="text-4xl font-extrabold text-blue-600 mb-2" style={{ fontFamily: 'Baloo 2, cursive' }}>Welcome to HealthBot!</h1>
           <p className="text-lg text-gray-600 mb-6 text-center">Your cute AI health assistant. Please sign in or sign up to continue!</p>
           <div className="flex flex-col space-y-3 w-full">
@@ -176,9 +184,18 @@ const Index = () => {
             </SignUpDialog>
           </div>
           <div className="mt-8 flex justify-center space-x-4">
-            <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/pikachu.png" alt="Pikachu" className="w-16 h-16 rounded-full border-2 border-yellow-300 shadow" />
-            <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/spongebob.png" alt="SpongeBob" className="w-16 h-16 rounded-full border-2 border-yellow-300 shadow" />
-            <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/popeye.png" alt="Popeye" className="w-16 h-16 rounded-full border-2 border-blue-300 shadow" />
+            <div className="w-16 h-16 rounded-full border-2 border-yellow-300 shadow bg-yellow-100 flex items-center justify-center overflow-hidden">
+              <img src={pikachuUrl} alt="Pikachu" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display='none'} />
+              <span className="font-bold text-blue-900 absolute">Pikachu</span>
+            </div>
+            <div className="w-16 h-16 rounded-full border-2 border-yellow-300 shadow bg-yellow-100 flex items-center justify-center overflow-hidden">
+              <img src={spongebobUrl} alt="SpongeBob" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display='none'} />
+              <span className="font-bold text-blue-900 absolute">SpongeBob</span>
+            </div>
+            <div className="w-16 h-16 rounded-full border-2 border-blue-300 shadow bg-blue-100 flex items-center justify-center overflow-hidden">
+              <img src={popeyeUrl} alt="Popeye" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display='none'} />
+              <span className="font-bold text-blue-900 absolute">Popeye</span>
+            </div>
           </div>
         </div>
       </div>
