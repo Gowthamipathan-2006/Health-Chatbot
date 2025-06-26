@@ -44,6 +44,11 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     fetchModels();
   }, []);
 
+  // Helper to detect Telugu input
+  function isTelugu(text: string) {
+    return /[\u0C00-\u0C7F]/.test(text);
+  }
+
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
@@ -59,15 +64,22 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     setIsLoading(true);
 
     try {
-      console.log('Sending message to Gemini API:', inputMessage);
-
+      const isTeluguInput = isTelugu(inputMessage);
+      let promptInstruction =
+        "You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended.\n\nSymptoms/Question: ";
+      if (isTeluguInput) {
+        promptInstruction =
+          "You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended. Respond in Telugu.\n\nSymptoms/Question: ";
+      }
       const requestBody = {
         contents: [{
           parts: [{
-            text: `You are a helpful medical AI assistant. Please analyze these symptoms and provide general health information including potential conditions, general care recommendations, and when to seek medical attention. Always emphasize that this is not a medical diagnosis and professional consultation is recommended.\n\nSymptoms/Question: ${inputMessage}\n\nPlease structure your response with:\n1. Possible conditions (general information)\n2. General care recommendations\n3. When to seek immediate medical attention\n4. Disclaimer about consulting healthcare professionals`
+            text: `${promptInstruction}${inputMessage}\n\nPlease structure your response with:\n1. Possible conditions (general information)\n2. General care recommendations\n3. When to seek immediate medical attention\n4. Disclaimer about consulting healthcare professionals`
           }]
         }]
       };
+
+      console.log('Sending message to Gemini API:', inputMessage);
 
       const response = await fetch(GEMINI_API_URL, {
         method: 'POST',
@@ -152,6 +164,25 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     return sections;
   }
 
+  // Helper to render a section as a bulleted list if it contains lines starting with * or -
+  function renderSectionAsList(sectionText: string) {
+    const lines = sectionText.split(/\n|\r/).filter(line => line.trim() !== '');
+    const bulletLines = lines.filter(line => /^\s*([*-])\s+/.test(line));
+    if (bulletLines.length > 0) {
+      return (
+        <ul className="list-disc pl-6 space-y-1">
+          {lines.map((line, idx) =>
+            /^\s*([*-])\s+/.test(line)
+              ? <li key={idx}>{renderBold(line.replace(/^\s*([*-])\s+/, ''))}</li>
+              : <li key={idx} className="list-none">{renderBold(line)}</li>
+          )}
+        </ul>
+      );
+    } else {
+      return <p>{renderBold(sectionText)}</p>;
+    }
+  }
+
   const userGender = (typeof apiKey === 'object' && apiKey.gender) ? apiKey.gender : 'male';
   const userAvatar = userGender === 'female' ? '/images/female.png' : '/images/male.png';
   const botAvatar = '/images/doraemon.png';
@@ -169,8 +200,6 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 relative">
-      {/* Shinchan mascot in the corner */}
-      <img src={mascotAvatar} alt="Shinchan" className="w-20 h-20 absolute left-4 bottom-4 opacity-80 z-0" />
       <ScrollArea className="flex-1 p-4 relative z-10">
         <div className="space-y-4">
           {messages.map((message) => {
@@ -181,10 +210,10 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
               const sections = parseAIResponse(message.content);
               structured = (
                 <div className="space-y-3">
-                  {sections.conditions && <div className="bg-blue-100 rounded-xl p-3"><span className="font-bold text-blue-700">Possible Conditions:</span> {renderBold(sections.conditions)}</div>}
-                  {sections.care && <div className="bg-yellow-100 rounded-xl p-3"><span className="font-bold text-yellow-700">Care Recommendations:</span> {renderBold(sections.care)}</div>}
-                  {sections.attention && <div className="bg-pink-100 rounded-xl p-3"><span className="font-bold text-pink-700">When to Seek Medical Attention:</span> {renderBold(sections.attention)}</div>}
-                  {sections.disclaimer && <div className="bg-gray-100 rounded-xl p-3"><span className="font-bold text-gray-700">Disclaimer:</span> {renderBold(sections.disclaimer)}</div>}
+                  {sections.conditions && <div className="bg-blue-100 rounded-xl p-3"><span className="font-bold text-blue-700">Possible Conditions:</span> {renderSectionAsList(sections.conditions)}</div>}
+                  {sections.care && <div className="bg-yellow-100 rounded-xl p-3"><span className="font-bold text-yellow-700">Care Recommendations:</span> {renderSectionAsList(sections.care)}</div>}
+                  {sections.attention && <div className="bg-pink-100 rounded-xl p-3"><span className="font-bold text-pink-700">When to Seek Medical Attention:</span> {renderSectionAsList(sections.attention)}</div>}
+                  {sections.disclaimer && <div className="bg-gray-100 rounded-xl p-3"><span className="font-bold text-gray-700">Disclaimer:</span> {renderSectionAsList(sections.disclaimer)}</div>}
                 </div>
               );
             }
