@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import "https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap";
 
 interface Message {
   id: string;
@@ -119,40 +120,43 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
+    <div className="flex flex-col h-full bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50" style={{ fontFamily: 'Baloo 2, cursive' }}>
+      <ScrollArea className="flex-1 p-4 relative">
+        <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/doraemon.png" alt="Doraemon" className="w-20 h-20 absolute top-4 right-4 opacity-80 z-0" />
+        <div className="space-y-4 z-10 relative">
           {messages.map((message) => (
             <div
               key={message.id}
               className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
             >
-              <Card className={`max-w-[80%] ${
-                message.isUser 
-                  ? 'bg-blue-600 text-white border-blue-600' 
-                  : 'bg-white border-blue-200'
-              }`}>
-                <CardContent className="p-3">
-                  <div className="flex items-start space-x-2">
-                    {!message.isUser && <Bot className="h-5 w-5 mt-1 text-blue-600" />}
-                    {message.isUser && <User className="h-5 w-5 mt-1" />}
-                    <div className="flex-1">
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      <p className={`text-xs mt-1 opacity-70`}>
-                        {message.timestamp.toLocaleTimeString()}
-                      </p>
+              <div className="flex items-end space-x-2">
+                {!message.isUser && (
+                  <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/doraemon.png" alt="Bot" className="w-10 h-10 rounded-full border-2 border-blue-300 shadow" />
+                )}
+                <Card className={`max-w-[80%] rounded-3xl shadow-md ${
+                  message.isUser 
+                    ? 'bg-yellow-200 text-blue-900 border-yellow-300' 
+                    : 'bg-white border-blue-200'
+                }`}>
+                  <CardContent className="p-4">
+                    <div className="flex flex-col">
+                      <p className="text-base whitespace-pre-wrap" style={{ fontFamily: 'Baloo 2, cursive' }}>{message.content}</p>
+                      <p className="text-xs mt-1 opacity-70 text-right">{message.timestamp.toLocaleTimeString()}</p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+                {message.isUser && (
+                  <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/pikachu.png" alt="User" className="w-10 h-10 rounded-full border-2 border-yellow-300 shadow" />
+                )}
+              </div>
             </div>
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <Card className="max-w-[80%] bg-white border-blue-200">
-                <CardContent className="p-3">
+              <Card className="max-w-[80%] bg-white border-blue-200 rounded-3xl shadow-md">
+                <CardContent className="p-4">
                   <div className="flex items-center space-x-2">
-                    <Bot className="h-5 w-5 text-blue-600" />
+                    <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/doraemon.png" alt="Bot" className="w-8 h-8 rounded-full border-2 border-blue-300 shadow" />
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
                       <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -165,23 +169,24 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
           )}
         </div>
       </ScrollArea>
-
-      <div className="border-t border-blue-200 p-4">
+      <div className="border-t border-blue-200 p-4 bg-white/80 rounded-b-3xl shadow-inner">
         <div className="flex space-x-2">
           <Input
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Describe your symptoms..."
-            className="flex-1 border-blue-200 focus:border-blue-400"
+            className="flex-1 border-blue-200 focus:border-blue-400 rounded-full px-6 py-3 text-lg bg-yellow-50 shadow"
             disabled={isLoading}
+            style={{ fontFamily: 'Baloo 2, cursive' }}
           />
           <Button
             onClick={sendMessage}
             disabled={isLoading || !inputMessage.trim()}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-yellow-300 hover:bg-yellow-400 text-blue-900 rounded-full px-6 py-3 text-lg font-bold shadow-md flex items-center justify-center"
           >
-            <Send className="h-4 w-4" />
+            <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/pikachu.png" alt="Send" className="w-6 h-6 mr-2" />
+            Send
           </Button>
         </div>
       </div>

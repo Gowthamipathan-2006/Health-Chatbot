@@ -10,6 +10,7 @@ import ApiKeyManager from "@/components/ApiKeyManager";
 import ChatInterface from "@/components/ChatInterface";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import "https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -150,6 +151,35 @@ const Index = () => {
           {/* Chat Interface */}
           <div className="flex-1">
             <ChatInterface apiKey={apiKey} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-pink-100 via-blue-100 to-yellow-100" style={{ fontFamily: 'Baloo 2, cursive' }}>
+        <div className="flex flex-col items-center p-8 rounded-3xl shadow-2xl bg-white/80 border-4 border-blue-200 max-w-md w-full">
+          <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/doraemon.png" alt="Doraemon" className="w-24 h-24 mb-4 rounded-full border-4 border-pink-200 shadow-lg" />
+          <h1 className="text-4xl font-extrabold text-blue-600 mb-2" style={{ fontFamily: 'Baloo 2, cursive' }}>Welcome to HealthBot!</h1>
+          <p className="text-lg text-gray-600 mb-6 text-center">Your cute AI health assistant. Please sign in or sign up to continue!</p>
+          <div className="flex flex-col space-y-3 w-full">
+            <SignInDialog onAuth={setUser}>
+              <Button className="w-full py-3 rounded-full bg-yellow-300 hover:bg-yellow-400 text-blue-900 font-bold text-lg shadow-md transition-all duration-200">
+                <span role="img" aria-label="pikachu">⚡</span> Sign In
+              </Button>
+            </SignInDialog>
+            <SignUpDialog onAuth={setUser}>
+              <Button className="w-full py-3 rounded-full bg-pink-300 hover:bg-pink-400 text-blue-900 font-bold text-lg shadow-md transition-all duration-200">
+                <span role="img" aria-label="spongebob">🍍</span> Sign Up
+              </Button>
+            </SignUpDialog>
+          </div>
+          <div className="mt-8 flex justify-center space-x-4">
+            <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/pikachu.png" alt="Pikachu" className="w-16 h-16 rounded-full border-2 border-yellow-300 shadow" />
+            <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/spongebob.png" alt="SpongeBob" className="w-16 h-16 rounded-full border-2 border-yellow-300 shadow" />
+            <img src="https://raw.githubusercontent.com/Ashwinvalento/cartoon-avatar/master/lib/images/popeye.png" alt="Popeye" className="w-16 h-16 rounded-full border-2 border-blue-300 shadow" />
           </div>
         </div>
       </div>
