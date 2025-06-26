@@ -18,12 +18,12 @@ const spongebobUrl = "https://unpkg.com/@iconify/icons-logos/spongebob.svg";
 const popeyeUrl = "https://unpkg.com/@iconify/icons-logos/popeye.svg";
 
 const Index = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [historySearchQuery, setHistorySearchQuery] = useState("");
-  const [showChat, setShowChat] = useState(false);
-  const [apiKey, setApiKey] = useState("");
+  const [searchQuery, setSearchQuery] = useState(false);
+  const [historySearchQuery, setHistorySearchQuery] = useState(false);
+  const [showChat, setShowChat] = useState("");
+  const [apiKey, setApiKey] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [selectedBot, setSelectedBot] = useState<string | null>(null);
+  const [selectedBot, setSelectedBot] = useState(null);
   
   // Mock history data
   const chatHistory = [
