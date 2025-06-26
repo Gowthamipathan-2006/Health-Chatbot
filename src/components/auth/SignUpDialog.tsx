@@ -1,40 +1,25 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
 
 interface SignUpDialogProps {
   children: React.ReactNode;
-  onAuth?: (user: any) => void;
 }
 
-const SignUpDialog = ({ children, onAuth }: SignUpDialogProps) => {
+const SignUpDialog = ({ children }: SignUpDialogProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-    } else if (data.user) {
-      setOpen(false);
-      setName("");
-      setEmail("");
-      setPassword("");
-      if (onAuth) onAuth(data.user);
-    } else {
-      setError("Unknown error. Please try again.");
-    }
+    console.log("Sign up attempt:", { name, email, password });
+    // Here you would integrate with your authentication service
+    setOpen(false);
   };
 
   return (
@@ -59,7 +44,6 @@ const SignUpDialog = ({ children, onAuth }: SignUpDialogProps) => {
               onChange={(e) => setName(e.target.value)}
               required
               className="border-blue-200 focus:border-blue-400"
-              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -72,7 +56,6 @@ const SignUpDialog = ({ children, onAuth }: SignUpDialogProps) => {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="border-blue-200 focus:border-blue-400"
-              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -85,16 +68,13 @@ const SignUpDialog = ({ children, onAuth }: SignUpDialogProps) => {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="border-blue-200 focus:border-blue-400"
-              disabled={loading}
             />
           </div>
-          {error && <div className="text-red-600 text-sm">{error}</div>}
           <Button 
             type="submit" 
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            disabled={loading}
           >
-            {loading ? "Signing Up..." : "Sign Up"}
+            Sign Up
           </Button>
         </form>
       </DialogContent>
