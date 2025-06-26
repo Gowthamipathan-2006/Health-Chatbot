@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, History, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,12 +8,15 @@ import SignInDialog from "@/components/auth/SignInDialog";
 import SignUpDialog from "@/components/auth/SignUpDialog";
 import ApiKeyManager from "@/components/ApiKeyManager";
 import ChatInterface from "@/components/ChatInterface";
+import { supabase } from "@/integrations/supabase/client";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [historySearchQuery, setHistorySearchQuery] = useState("");
   const [showChat, setShowChat] = useState(false);
   const [apiKey, setApiKey] = useState("");
+  const [user, setUser] = useState<any>(null);
   
   // Mock history data
   const chatHistory = [
@@ -41,6 +43,16 @@ const Index = () => {
     setShowChat(true);
   };
 
+  useEffect(() => {
+    // Get current user on mount
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    // Listen for auth state changes
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => { listener?.subscription.unsubscribe(); };
+  }, []);
+
   if (showChat && apiKey) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -62,16 +74,38 @@ const Index = () => {
               >
                 Back to Home
               </Button>
-              <SignInDialog>
-                <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
-                  Sign In
-                </Button>
-              </SignInDialog>
-              <SignUpDialog>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Sign Up
-                </Button>
-              </SignUpDialog>
+              {user ? (
+                <div className="relative group">
+                  <Avatar className="w-9 h-9 cursor-pointer">
+                    <AvatarFallback>{user.user_metadata?.name?.[0] || user.email[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                    <div className="p-4 border-b">
+                      <div className="font-semibold">{user.user_metadata?.name || user.email}</div>
+                      <div className="text-xs text-gray-500">{user.email}</div>
+                    </div>
+                    <button
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-blue-50"
+                      onClick={async () => { await supabase.auth.signOut(); setUser(null); }}
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <SignInDialog onAuth={setUser}>
+                    <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                      Sign In
+                    </Button>
+                  </SignInDialog>
+                  <SignUpDialog onAuth={setUser}>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                      Sign Up
+                    </Button>
+                  </SignUpDialog>
+                </>
+              )}
             </div>
           </div>
         </header>
@@ -135,16 +169,38 @@ const Index = () => {
           </div>
           
           <div className="flex items-center space-x-3">
-            <SignInDialog>
-              <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
-                Sign In
-              </Button>
-            </SignInDialog>
-            <SignUpDialog>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Sign Up
-              </Button>
-            </SignUpDialog>
+            {user ? (
+              <div className="relative group">
+                <Avatar className="w-9 h-9 cursor-pointer">
+                  <AvatarFallback>{user.user_metadata?.name?.[0] || user.email[0]}</AvatarFallback>
+                </Avatar>
+                <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                  <div className="p-4 border-b">
+                    <div className="font-semibold">{user.user_metadata?.name || user.email}</div>
+                    <div className="text-xs text-gray-500">{user.email}</div>
+                  </div>
+                  <button
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-blue-50"
+                    onClick={async () => { await supabase.auth.signOut(); setUser(null); }}
+                  >
+                    Log Out
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <SignInDialog onAuth={setUser}>
+                  <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                    Sign In
+                  </Button>
+                </SignInDialog>
+                <SignUpDialog onAuth={setUser}>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    Sign Up
+                  </Button>
+                </SignUpDialog>
+              </>
+            )}
           </div>
         </div>
       </header>
