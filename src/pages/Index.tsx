@@ -18,12 +18,11 @@ const spongebobUrl = "https://unpkg.com/@iconify/icons-logos/spongebob.svg";
 const popeyeUrl = "https://unpkg.com/@iconify/icons-logos/popeye.svg";
 
 const Index = () => {
-  const [searchQuery, setSearchQuery] = useState(false);
-  const [historySearchQuery, setHistorySearchQuery] = useState(false);
-  const [showChat, setShowChat] = useState("");
-  const [apiKey, setApiKey] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [historySearchQuery, setHistorySearchQuery] = useState("");
+  const [showChat, setShowChat] = useState(false);
+  const [apiKey, setApiKey] = useState("");
   const [user, setUser] = useState<any>(null);
-  const [selectedBot, setSelectedBot] = useState(null);
   
   // Mock history data
   const chatHistory = [
@@ -215,13 +214,9 @@ const Index = () => {
       description: 'Generate scripts for automation, coding, or creative writing.',
       image: 'https://unpkg.com/@iconify/icons-logos/popeye.svg',
     },
-    {
-      key: 'recipe',
-      name: 'Recipe Generator',
-      description: 'Get delicious recipes based on ingredients, cuisine, or dietary needs.',
-      image: 'https://cdn-icons-png.flaticon.com/512/1046/1046857.png',
-    },
   ];
+
+  const [selectedBot, setSelectedBot] = useState<string | null>(null);
 
   if (selectedBot && apiKey) {
     return (

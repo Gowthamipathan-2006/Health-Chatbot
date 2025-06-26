@@ -12,7 +12,7 @@ const ApiKeyManager = ({ onApiKeySet }: ApiKeyManagerProps) => {
 
   useEffect(() => {
     // Automatically set the provided API key
-    const apiKey = "AIpzSSayDpa2sH5zVIsx4TSUSssbBEI93Wvjh3ERG";
+    const apiKey = "AIzaSyDPa2sH5zVIsx4TSUYssbBEI93Wvjh3ERY";
     setIsConfigured(true);
     onApiKeySet(apiKey);
     console.log('API key configured automatically');
