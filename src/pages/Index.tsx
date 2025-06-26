@@ -23,6 +23,7 @@ const Index = () => {
   const [showChat, setShowChat] = useState(false);
   const [apiKey, setApiKey] = useState("");
   const [user, setUser] = useState<any>(null);
+  const [selectedBot, setSelectedBot] = useState<string | null>(null);
   
   // Mock history data
   const chatHistory = [
@@ -215,8 +216,6 @@ const Index = () => {
       image: 'https://unpkg.com/@iconify/icons-logos/popeye.svg',
     },
   ];
-
-  const [selectedBot, setSelectedBot] = useState<string | null>(null);
 
   if (selectedBot && apiKey) {
     return (
