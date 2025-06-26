@@ -46,6 +46,13 @@ const botConfigs = {
       "You are a helpful AI script generator. Please generate a script or code for the following request, and explain the logic.\n\nRequest: " +
       input +
       "\n\nPlease structure your response with:\n1. Script/Code\n2. Explanation\n3. Usage Tips\n4. Disclaimer about reviewing and testing code."
+  },
+  recipe: {
+    initial: "Hi! I'm your Recipe Generator Bot. Ask me for recipes based on ingredients, cuisine, or dietary needs!",
+    prompt: (input: string) =>
+      "You are a helpful AI recipe generator. Please provide a recipe based on the following request.\n\nRequest: " +
+      input +
+      "\n\nPlease structure your response with:\n1. Recipe Name\n2. Ingredients\n3. Steps\n4. Tips\n5. Disclaimer about dietary needs and checking with a nutritionist."
   }
 };
 
@@ -90,6 +97,24 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     return /[\u0C00-\u0C7F]/.test(text);
   }
 
+  const fieldKeywords = {
+    health: [
+      "symptom", "medicine", "health", "doctor", "pain", "fever", "cough", "cold", "flu", "injury", "treatment", "wellness", "diet", "exercise", "illness", "disease", "infection", "headache", "stomach", "body", "mental", "stress", "anxiety", "sleep", "nutrition", "fitness", "clinic", "hospital", "medical", "blood", "pressure", "diabetes", "asthma", "allergy", "skin", "rash", "wound", "fracture", "burn", "sick", "vomit", "nausea", "constipation", "diarrhea", "cancer", "therapy", "recovery", "healthcare", "nurse", "medication", "prescription", "pharmacy", "vaccine", "immunization", "checkup", "appointment", "surgery", "operation", "emergency", "ambulance", "first aid", "virus", "bacteria", "covid", "corona", "pandemic", "epidemic", "public health", "well-being", "prevention", "remedy", "disorder", "condition", "diagnosis", "prognosis", "rehabilitation", "support", "specialist", "cardiology", "dermatology", "neurology", "orthopedic", "pediatric", "gynecology", "obstetrics", "urology", "oncology", "psychiatry", "psychology", "dentist", "dental", "oral", "vision", "eye", "hearing", "ear", "nose", "throat", "lungs", "liver", "kidney", "heart", "brain", "muscle", "bone", "joint", "arthritis", "sprain", "strain", "bruise", "cut", "bleeding", "swelling", "inflammation", "immune", "system", "reaction", "hypertension", "cholesterol", "obesity", "weight", "malnutrition", "dehydration", "hydration", "workout", "yoga", "meditation", "depression", "counseling", "group", "addiction", "smoking", "alcohol", "substance", "abuse", "rehab", "pregnancy", "prenatal", "postnatal", "childbirth", "baby", "infant", "child", "adolescent", "adult", "elderly", "senior", "geriatric", "women's health", "men's health", "sexual health", "reproductive health", "family planning", "contraception", "fertility", "menstruation", "period", "menopause", "andrology", "prostate", "testosterone", "estrogen", "hormone", "thyroid", "metabolism", "vitamin", "mineral", "supplement", "food", "intolerance", "digestion", "digestive", "gastroenterology", "intestine", "colon", "rectum", "gallbladder", "pancreas", "spleen", "urinary", "bladder", "renal", "testicle", "ovary", "uterus", "cervix", "vagina", "penis", "scrotum", "breast", "chest", "respiratory", "bronchitis", "pneumonia", "tuberculosis", "sinus", "tonsil", "deaf", "blind", "cataract", "glaucoma", "retina", "cornea", "conjunctivitis", "pink eye", "eczema", "psoriasis", "acne", "pimple", "boil", "ulcer", "scar", "hair", "nail", "dandruff", "bald", "alopecia", "tumor", "lump", "ache", "sore", "cramp", "spasm", "stiff", "weak", "paralysis", "numb", "tingle", "faint", "dizzy", "vertigo", "seizure", "convulsion", "fit", "stroke", "heart attack", "cardiac", "arrhythmia", "palpitation", "shortness of breath", "breathless", "wheeze"
+    ],
+    study: [
+      "study", "learn", "explain", "explanation", "homework", "assignment", "school", "college", "university", "exam", "test", "quiz", "syllabus", "subject", "topic", "math", "science", "physics", "chemistry", "biology", "history", "geography", "civics", "politics", "economics", "accounting", "business studies", "computer", "programming", "coding", "language", "grammar", "essay", "composition", "summary", "notes", "revision", "memorize", "understand", "explain", "definition", "theory", "concept", "formula", "problem", "solution", "practice", "question", "answer", "explain", "explanation", "tips", "tricks", "mnemonic", "flashcard", "resource", "reference", "book", "chapter", "page", "paragraph", "sentence", "word", "vocabulary", "spelling", "pronunciation", "lecture", "class", "teacher", "professor", "tutor", "guide", "help", "doubt", "clarify", "explain"
+    ],
+    business: [
+      "business", "company", "startup", "entrepreneur", "market", "marketing", "sales", "strategy", "plan", "finance", "investment", "profit", "loss", "revenue", "cost", "expense", "accounting", "customer", "client", "deal", "negotiation", "pitch", "proposal", "project", "management", "team", "leadership", "growth", "scaling", "competition", "industry", "trend", "analysis", "insight", "recommendation", "risk", "opportunity", "innovation", "product", "service", "brand", "advertising", "promotion", "campaign", "digital", "online", "ecommerce", "supply", "demand", "logistics", "distribution", "retail", "wholesale", "B2B", "B2C", "partnership", "merger", "acquisition", "valuation", "funding", "venture", "capital", "angel", "investor", "share", "stock", "equity", "IPO", "regulation", "compliance", "legal", "contract", "agreement", "HR", "human resource", "hiring", "recruitment", "training", "employee", "salary", "bonus", "incentive", "motivation", "performance", "review", "goal", "objective", "KPI", "OKR", "report", "presentation", "meeting", "network", "connection", "mentor", "advice", "consultant", "consulting"
+    ],
+    scripts: [
+      "script", "code", "automation", "program", "function", "class", "variable", "loop", "condition", "if", "else", "for", "while", "switch", "case", "break", "continue", "return", "input", "output", "print", "log", "debug", "error", "exception", "try", "catch", "finally", "import", "export", "require", "module", "package", "library", "framework", "API", "endpoint", "request", "response", "fetch", "axios", "http", "https", "json", "parse", "stringify", "object", "array", "list", "set", "map", "dictionary", "data", "database", "SQL", "query", "insert", "update", "delete", "select", "join", "index", "key", "value", "loop", "iteration", "recursion", "sort", "search", "algorithm", "DSA", "structure", "file", "read", "write", "open", "close", "save", "load", "path", "directory", "folder", "shell", "bash", "powershell", "terminal", "command", "run", "execute", "compile", "build", "test", "deploy", "CI", "CD", "pipeline", "github", "gitlab", "bitbucket", "commit", "push", "pull", "merge", "branch", "clone", "fork", "issue", "PR", "review", "lint", "format", "style", "doc", "comment", "annotation", "todo", "fixme", "bug", "feature", "release", "version", "npm", "yarn", "pnpm", "install", "uninstall", "update", "upgrade", "dependency", "devDependency", "env", "environment", "config", "settings", "option", "parameter", "argument", "flag", "boolean", "string", "number", "int", "float", "double", "char", "byte", "buffer", "stream", "event", "listener", "handler", "callback", "promise", "async", "await", "thread", "process", "worker", "concurrent", "parallel", "performance", "optimize", "refactor", "clean", "architecture", "pattern", "MVC", "MVVM", "singleton", "factory", "observer", "decorator", "proxy", "adapter", "bridge", "command", "strategy", "state", "template", "visitor", "chain", "responsibility", "solid", "oop", "functional", "react", "vue", "angular", "svelte", "next", "nuxt", "remix", "astro", "express", "koa", "fastify", "django", "flask", "spring", "rails", "laravel", "symfony", "dotnet", "csharp", "java", "python", "javascript", "typescript", "c++", "c", "go", "rust", "php", "ruby", "swift", "kotlin", "scala", "perl", "bash", "shell", "powershell", "sql", "html", "css", "json", "xml", "yaml", "toml", "ini", "md", "markdown"
+    ],
+    recipe: [
+      "recipe", "cook", "cooking", "bake", "baking", "grill", "fry", "roast", "boil", "steam", "saute", "dish", "meal", "food", "ingredient", "cuisine", "dessert", "snack", "breakfast", "lunch", "dinner", "vegetarian", "vegan", "gluten", "dairy", "allergy", "nut", "protein", "carb", "fat", "sugar", "spice", "herb", "sauce", "marinate", "mix", "blend", "chop", "slice", "dice", "mince", "boil", "simmer", "stew", "soup", "salad", "starter", "main course", "side", "garnish", "serve", "portion", "calorie", "nutrition", "diet", "healthy", "quick", "easy", "homemade", "traditional", "international", "indian", "italian", "chinese", "mexican", "thai", "french", "american", "japanese", "korean", "mediterranean", "arabic", "spicy", "sweet", "savory", "sour", "umami", "microwave", "oven", "stove", "pan", "pot", "pressure cooker", "instant pot", "air fryer", "griddle", "barbecue", "bbq", "tandoor", "recipe idea", "what can I make", "how to make", "cooking instructions", "cooking method", "cooking time", "serving size", "portion size", "meal prep", "meal plan", "leftover", "substitute", "swap", "replace", "without", "with"
+    ]
+  };
+
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
@@ -104,11 +129,36 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
     setInputMessage("");
     setIsLoading(true);
 
+    // Restrict bot to its field
+    const keywords = fieldKeywords[botType] || [];
+    const inputLower = inputMessage.toLowerCase();
+    const isRelevant = keywords.some(keyword => inputLower.includes(keyword));
+    if (!isRelevant) {
+      const politeMsg = {
+        health: "I'm here to help with health-related questions only. Please ask me about health, symptoms, wellness, or medical topics.",
+        study: "I'm here to help with study-related questions only. Please ask me about study topics, learning, or academic questions.",
+        business: "I'm here to help with business-related questions only. Please ask me about business, entrepreneurship, or market topics.",
+        scripts: "I'm here to help with scripts, code, and automation only. Please ask me about programming, code, or automation tasks.",
+        recipe: "I'm here to help with recipe-related questions only. Please ask me about recipes, cooking, or food topics."
+      };
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: politeMsg[botType] || "I'm here to help with questions relevant to my field only.",
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       let promptText = "";
       if (botType === 'health') {
         const isTeluguInput = isTelugu(inputMessage);
         promptText = botConfig.prompt(inputMessage, isTeluguInput);
+      } else if (botType === 'recipe') {
+        promptText = botConfig.prompt(inputMessage);
       } else {
         promptText = botConfig.prompt(inputMessage);
       }
@@ -236,6 +286,20 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
         sections.disclaimer = response;
       }
       return { type: 'scripts', ...sections };
+    } else if (botType === 'recipe') {
+      const sections = { name: '', ingredients: '', steps: '', tips: '', disclaimer: '' };
+      const regex = /1\.[\s\S]*?2\.|2\.[\s\S]*?3\.|3\.[\s\S]*?4\.|4\.[\s\S]*?5\.|5\.[\s\S]*/g;
+      const matches = response.match(regex);
+      if (matches) {
+        if (matches[0]) sections.name = matches[0].replace(/1\./, '').replace(/2\.$/, '').trim();
+        if (matches[1]) sections.ingredients = matches[1].replace(/2\./, '').replace(/3\.$/, '').trim();
+        if (matches[2]) sections.steps = matches[2].replace(/3\./, '').replace(/4\.$/, '').trim();
+        if (matches[3]) sections.tips = matches[3].replace(/4\./, '').replace(/5\.$/, '').trim();
+        if (matches[4]) sections.disclaimer = matches[4].replace(/5\./, '').trim();
+      } else {
+        sections.disclaimer = response;
+      }
+      return { type: 'recipe', ...sections };
     }
     return { type: 'default', disclaimer: response };
   }
@@ -324,6 +388,16 @@ const ChatInterface = ({ apiKey }: ChatInterfaceProps) => {
                     {sections.code && <div className="bg-blue-100 rounded-xl p-3"><span className="font-bold text-blue-700">Script/Code:</span> <pre className="whitespace-pre-wrap break-words">{sections.code}</pre></div>}
                     {sections.explanation && <div className="bg-yellow-100 rounded-xl p-3"><span className="font-bold text-yellow-700">Explanation:</span> {renderSectionAsList(sections.explanation)}</div>}
                     {sections.tips && <div className="bg-pink-100 rounded-xl p-3"><span className="font-bold text-pink-700">Usage Tips:</span> {renderSectionAsList(sections.tips)}</div>}
+                    {sections.disclaimer && <div className="bg-gray-100 rounded-xl p-3"><span className="font-bold text-gray-700">Disclaimer:</span> {renderSectionAsList(sections.disclaimer)}</div>}
+                  </div>
+                );
+              } else if (sections.type === 'recipe') {
+                structured = (
+                  <div className="space-y-3">
+                    {sections.name && <div className="bg-blue-100 rounded-xl p-3"><span className="font-bold text-blue-700">Recipe Name:</span> {renderSectionAsList(sections.name)}</div>}
+                    {sections.ingredients && <div className="bg-yellow-100 rounded-xl p-3"><span className="font-bold text-yellow-700">Ingredients:</span> {renderSectionAsList(sections.ingredients)}</div>}
+                    {sections.steps && <div className="bg-pink-100 rounded-xl p-3"><span className="font-bold text-pink-700">Steps:</span> {renderSectionAsList(sections.steps)}</div>}
+                    {sections.tips && <div className="bg-green-100 rounded-xl p-3"><span className="font-bold text-green-700">Tips:</span> {renderSectionAsList(sections.tips)}</div>}
                     {sections.disclaimer && <div className="bg-gray-100 rounded-xl p-3"><span className="font-bold text-gray-700">Disclaimer:</span> {renderSectionAsList(sections.disclaimer)}</div>}
                   </div>
                 );
