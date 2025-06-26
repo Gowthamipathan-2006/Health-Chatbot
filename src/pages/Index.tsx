@@ -215,12 +215,6 @@ const Index = () => {
       description: 'Generate scripts for automation, coding, or creative writing.',
       image: 'https://unpkg.com/@iconify/icons-logos/popeye.svg',
     },
-    {
-      key: 'recipe',
-      name: 'Recipe Generator',
-      description: 'Get delicious recipes based on ingredients, cuisine, or dietary needs.',
-      image: 'https://cdn-icons-png.flaticon.com/512/1046/1046857.png',
-    },
   ];
 
   if (selectedBot && apiKey) {
