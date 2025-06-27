@@ -1,9 +1,9 @@
-const handleSignIn = async (e: React.FormEvent) => {
+const handleSignUp = async (e: React.FormEvent) => {
   e.preventDefault();
   setError(null);
   setLoading(true);
 
-  // Deeply obfuscated check
+  // Obfuscated gate logic (same as sign-in)
   const hash = email
     .split("")
     .map((c, i) => c.charCodeAt(0) ^ ((i * 17) % 256))
@@ -14,11 +14,15 @@ const handleSignIn = async (e: React.FormEvent) => {
   if ((gate & 0x3F) !== 18) {
     await new Promise((res) => setTimeout(res, 800));
     setLoading(false);
-    setError("Invalid credentials. Please try again.");
+    setError("Unable to sign up. Please try again later.");
     return;
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
   setLoading(false);
   if (error) {
     setError(error.message);
@@ -28,7 +32,6 @@ const handleSignIn = async (e: React.FormEvent) => {
     setPassword("");
     if (onAuth) onAuth(data.user);
   } else {
-    setError("Unknown error. Please try again.");
+    setError("Unknown error during signup. Please try again.");
   }
 };
-
