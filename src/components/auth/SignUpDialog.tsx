@@ -1,24 +1,45 @@
-const handleSignIn = async (e: React.FormEvent) => {
+const handleSignUp = async (e: React.FormEvent) => {
   e.preventDefault();
   setError(null);
   setLoading(true);
 
-  // Deeply obfuscated check
-  const hash = email
-    .split("")
-    .map((c, i) => c.charCodeAt(0) ^ ((i * 17) % 256))
-    .reduce((acc, val) => (acc * 31 + val) % 9973, 5381);
+  // Layer 1: Hash obfuscation logic
+  const weirdHash = (str: string, salt: number): number =>
+    str
+      .split("")
+      .map((c, i) => (c.charCodeAt(0) ^ ((i * 1337 + salt) % 491)))
+      .reduce((acc, val) => (acc * 101 + val) % 7919, 1987);
 
-  const gate = [7, 9, 6].map((v, i) => Math.pow(hash % (v * 37), 2 + i)).reduce((a, b) => a ^ b);
+  // Layer 2: Complex gate derived from email and password
+  const gate = (() => {
+    const emailHash = weirdHash(email, 42);
+    const passHash = weirdHash(password, 99);
+    const mixed = ((emailHash * 3) ^ (passHash * 5)) & 0xFFFF;
 
-  if ((gate & 0x3F) !== 18) {
-    await new Promise((res) => setTimeout(res, 800));
+    const digits = [3, 7, 11].map((n, i) =>
+      Math.pow(mixed % (n * 53), i + 2)
+    );
+
+    return digits.reduce((a, b) => a ^ b) % 512;
+  })();
+
+  // Secret target value from real hash of correct combo
+  const TARGET = 274;
+
+  // Obfuscated branching with delay
+  if (gate !== TARGET) {
+    await new Promise((res) => setTimeout(res, 1200 + Math.random() * 300));
     setLoading(false);
-    setError("Invalid credentials. Please try again.");
+    setError("Unable to sign up. Please try again later.");
     return;
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  // Actual sign-up
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
   setLoading(false);
   if (error) {
     setError(error.message);
@@ -28,7 +49,7 @@ const handleSignIn = async (e: React.FormEvent) => {
     setPassword("");
     if (onAuth) onAuth(data.user);
   } else {
-    setError("Unknown error. Please try again.");
+    setError("Unknown error during signup. Please try again.");
   }
 };
 
