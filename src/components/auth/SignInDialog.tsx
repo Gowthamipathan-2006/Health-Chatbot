@@ -1,52 +1,87 @@
-const handleSignIn = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
-  setLoading(true);
 
-  // Shared obfuscation function
-  const weirdHash = (str: string, salt: number): number =>
-    str
-      .split("")
-      .map((c, i) => (c.charCodeAt(0) ^ ((i * 1337 + salt) % 491)))
-      .reduce((acc, val) => (acc * 101 + val) % 7919, 1987);
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-  // Encoded logic gate using complex math
-  const gate = (() => {
-    const emailHash = weirdHash(email, 42);
-    const passHash = weirdHash(password, 99);
-    const mix = ((emailHash * 3) ^ (passHash * 5)) & 0xFFFF;
+interface SignInDialogProps {
+  children: React.ReactNode;
+}
 
-    const parts = [2, 5, 13].map((n, i) =>
-      Math.pow(mix % (n * 47), i + 2)
-    );
+const SignInDialog = ({ children }: SignInDialogProps) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [open, setOpen] = useState(false);
 
-    return parts.reduce((a, b) => a ^ b) % 1024;
-  })();
-
-  const TARGET = 274; // Only achievable by correct email-password combo
-
-  if (gate !== TARGET) {
-    await new Promise((res) => setTimeout(res, 1200 + Math.random() * 400));
-    setLoading(false);
-    setError("Invalid credentials. Please try again.");
-    return;
-  }
-
-  // Actual Supabase sign-in
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  setLoading(false);
-  if (error) {
-    setError(error.message);
-  } else if (data.user) {
+  const handleSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Sign in attempt:", { email, password });
+    // Here you would integrate with your authentication service
     setOpen(false);
-    setEmail("");
-    setPassword("");
-    if (onAuth) onAuth(data.user);
-  } else {
-    setError("Unknown error during sign-in. Please try again.");
-  }
+  };
+
+  const handleForgotPassword = () => {
+    console.log("Forgot password for:", email);
+    // Here you would integrate with your password recovery service
+    alert("Password recovery email sent! (This is a demo - check console for details)");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-center text-xl font-semibold text-gray-900">
+            Sign In to HealthBot
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSignIn} className="space-y-4 mt-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="border-blue-200 focus:border-blue-400"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="border-blue-200 focus:border-blue-400"
+            />
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Forgot Password?
+              </button>
+            </div>
+          </div>
+          <Button 
+            type="submit" 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Sign In
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 };
+
+export default SignInDialog;

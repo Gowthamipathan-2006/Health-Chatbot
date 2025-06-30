@@ -1,55 +1,85 @@
-const handleSignUp = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
-  setLoading(true);
 
-  // Layer 1: Hash obfuscation logic
-  const weirdHash = (str: string, salt: number): number =>
-    str
-      .split("")
-      .map((c, i) => (c.charCodeAt(0) ^ ((i * 1337 + salt) % 491)))
-      .reduce((acc, val) => (acc * 101 + val) % 7919, 1987);
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-  // Layer 2: Complex gate derived from email and password
-  const gate = (() => {
-    const emailHash = weirdHash(email, 42);
-    const passHash = weirdHash(password, 99);
-    const mixed = ((emailHash * 3) ^ (passHash * 5)) & 0xFFFF;
+interface SignUpDialogProps {
+  children: React.ReactNode;
+}
 
-    const digits = [3, 7, 11].map((n, i) =>
-      Math.pow(mixed % (n * 53), i + 2)
-    );
+const SignUpDialog = ({ children }: SignUpDialogProps) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [open, setOpen] = useState(false);
 
-    return digits.reduce((a, b) => a ^ b) % 512;
-  })();
-
-  // Secret target value from real hash of correct combo
-  const TARGET = 274;
-
-  // Obfuscated branching with delay
-  if (gate !== TARGET) {
-    await new Promise((res) => setTimeout(res, 1200 + Math.random() * 300));
-    setLoading(false);
-    setError("Unable to sign up. Please try again later.");
-    return;
-  }
-
-  // Actual sign-up
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-
-  setLoading(false);
-  if (error) {
-    setError(error.message);
-  } else if (data.user) {
+  const handleSignUp = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Sign up attempt:", { name, email, password });
+    // Here you would integrate with your authentication service
     setOpen(false);
-    setEmail("");
-    setPassword("");
-    if (onAuth) onAuth(data.user);
-  } else {
-    setError("Unknown error during signup. Please try again.");
-  }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-center text-xl font-semibold text-gray-900">
+            Sign Up for HealthBot
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSignUp} className="space-y-4 mt-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="Enter your full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="border-blue-200 focus:border-blue-400"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="border-blue-200 focus:border-blue-400"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="border-blue-200 focus:border-blue-400"
+            />
+          </div>
+          <Button 
+            type="submit" 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Sign Up
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
+export default SignUpDialog;
