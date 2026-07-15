@@ -99,5 +99,28 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Comfortaa', 'Nunito', sans-serif;
+  }
+
+  .cute-gradient {
+    background: linear-gradient(135deg, #FFEBF0 0%, #F5F3FF 50%, #E0F2FE 100%);
+  }
+
+  .cute-panel {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .cute-shadow {
+    box-shadow: 0 12px 24px -4px rgba(244, 63, 94, 0.08), 0 4px 12px -2px rgba(59, 130, 246, 0.08);
+  }
+  
+  .cute-bubble-shadow-user {
+    box-shadow: 0 4px 15px rgba(244, 63, 94, 0.15);
+  }
+  
+  .cute-bubble-shadow-bot {
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
   }
 }

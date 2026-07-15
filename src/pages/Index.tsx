@@ -1,273 +1,172 @@
-
 import { useState } from "react";
-import { Search, History, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import SignInDialog from "@/components/auth/SignInDialog";
-import SignUpDialog from "@/components/auth/SignUpDialog";
 import ApiKeyManager from "@/components/ApiKeyManager";
 import ChatInterface from "@/components/ChatInterface";
 
 const Index = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [historySearchQuery, setHistorySearchQuery] = useState("");
-  const [showChat, setShowChat] = useState(false);
   const [apiKey, setApiKey] = useState("");
   
-  // Mock history data
-  const chatHistory = [
-    { id: 1, title: "Headache symptoms", date: "2024-06-15", preview: "What could cause persistent headaches?" },
-    { id: 2, title: "Flu prevention", date: "2024-06-14", preview: "How to prevent getting the flu during winter?" },
-    { id: 3, title: "Exercise routine", date: "2024-06-13", preview: "Safe exercise routine for beginners" },
-    { id: 4, title: "Healthy diet tips", date: "2024-06-12", preview: "What foods should I include in my daily diet?" },
-    { id: 5, title: "Sleep disorders", date: "2024-06-11", preview: "Trouble sleeping at night, what can help?" },
-  ];
+  // Local Authentication State
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const filteredHistory = chatHistory.filter(item =>
-    item.title.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
-    item.preview.toLowerCase().includes(historySearchQuery.toLowerCase())
-  );
-
-  const handleMainSearch = () => {
-    if (searchQuery.trim()) {
-      console.log("Searching for:", searchQuery);
-      setShowChat(true);
-    }
+  const handleAuthSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(isSignUp ? "Signing up..." : "Signing in...", { name, email });
+    setIsLoggedIn(true); // Mock successful login
   };
 
-  const handleStartChat = () => {
-    setShowChat(true);
+  const handleSignOut = () => {
+    setIsLoggedIn(false);
+    setName("");
+    setEmail("");
+    setPassword("");
   };
 
-  if (showChat && apiKey) {
+  // Auth Screen
+  if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-blue-100">
-          <div className="w-full px-6 py-4 flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">H</span>
-              </div>
-              <span className="text-xl font-semibold text-gray-900">HealthBot</span>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowChat(false)}
-                className="border-blue-200 text-blue-700 hover:bg-blue-50"
-              >
-                Back to Home
-              </Button>
-              <SignInDialog>
-                <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
-                  Sign In
-                </Button>
-              </SignInDialog>
-              <SignUpDialog>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Sign Up
-                </Button>
-              </SignUpDialog>
-            </div>
-          </div>
-        </header>
+      <div className="min-h-screen cute-gradient flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Decorative background shapes */}
+        <div className="absolute top-10 left-10 w-24 h-24 rounded-full bg-pink-200/40 blur-xl pointer-events-none"></div>
+        <div className="absolute bottom-10 right-10 w-32 h-32 rounded-full bg-blue-200/40 blur-xl pointer-events-none"></div>
 
-        <div className="flex w-full h-[calc(100vh-80px)]">
-          {/* History Sidebar */}
-          <div className="w-80 bg-white border-r border-blue-100 shadow-sm">
-            <div className="p-4 border-b border-blue-100">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Card className="w-full max-w-md cute-panel border border-pink-100/60 cute-shadow p-6 md:p-8 rounded-[2.5rem] relative z-10">
+          <CardContent className="p-0">
+            {/* Mascot Avatars decoration */}
+            <div className="flex justify-center items-center gap-6 mb-6">
+              <div className="bg-blue-50/80 p-2.5 rounded-2xl border border-blue-200/40 shadow-sm hover:scale-105 transition-transform relative group">
+                <img src="/doraemon.png" alt="Doraemon" className="h-16 w-16 object-contain drop-shadow-md" />
+                <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-blue-400 text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold">Bot Mascot</span>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-pink-100 border border-pink-200 flex items-center justify-center text-pink-500 font-bold text-sm animate-pulse">
+                🌸
+              </div>
+              <div className="bg-pink-50/80 p-2.5 rounded-2xl border border-pink-200/40 shadow-sm hover:scale-105 transition-transform relative group">
+                <img src="/shinchan.png" alt="Shinchan" className="h-16 w-16 object-contain drop-shadow-md" />
+                <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-pink-400 text-white text-[8px] px-1.5 py-0.5 rounded-full font-bold">User Mascot</span>
+              </div>
+            </div>
+
+            <div className="text-center mb-6">
+              <h1 className="text-3xl font-extrabold text-pink-950 mb-2 tracking-tight">
+                CUTE <span className="bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">HEALTHBOT</span> 🩺🌸
+              </h1>
+              <p className="text-xs text-pink-900/70 font-semibold">
+                {isSignUp ? "Create a cute account to get started!" : "Welcome back! Sign in to chat with Doraemon!"}
+              </p>
+            </div>
+
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              {isSignUp && (
+                <div className="space-y-1.5 text-left">
+                  <label className="text-xs font-bold text-pink-950/80 pl-1">Name</label>
+                  <Input
+                    type="text"
+                    placeholder="Your cute name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required={isSignUp}
+                    className="border-pink-200 focus-visible:ring-pink-300 focus-visible:border-pink-300 rounded-xl bg-white/70 text-pink-950 font-medium placeholder:text-pink-200"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1.5 text-left">
+                <label className="text-xs font-bold text-pink-950/80 pl-1">Email</label>
                 <Input
-                  placeholder="Search history..."
-                  value={historySearchQuery}
-                  onChange={(e) => setHistorySearchQuery(e.target.value)}
-                  className="pl-10 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="border-pink-200 focus-visible:ring-pink-300 focus-visible:border-pink-300 rounded-xl bg-white/70 text-pink-950 font-medium placeholder:text-pink-200"
                 />
               </div>
-            </div>
-            
-            <div className="p-4">
-              <div className="flex items-center space-x-2 mb-4">
-                <History className="h-5 w-5 text-blue-600" />
-                <h3 className="font-semibold text-gray-900">Chat History</h3>
-              </div>
-              
-              <ScrollArea className="h-[calc(100vh-250px)]">
-                <div className="space-y-2">
-                  {filteredHistory.map((item) => (
-                    <Card key={item.id} className="cursor-pointer hover:shadow-md transition-all duration-200 border-blue-100 hover:border-blue-300">
-                      <CardContent className="p-3">
-                        <h4 className="font-medium text-gray-900 text-sm mb-1">{item.title}</h4>
-                        <p className="text-xs text-gray-500 mb-2">{item.date}</p>
-                        <p className="text-xs text-gray-600 line-clamp-2">{item.preview}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          </div>
 
-          {/* Chat Interface */}
-          <div className="flex-1">
-            <ChatInterface apiKey={apiKey} />
-          </div>
-        </div>
+              <div className="space-y-1.5 text-left">
+                <label className="text-xs font-bold text-pink-950/80 pl-1">Password</label>
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="border-pink-200 focus-visible:ring-pink-300 focus-visible:border-pink-300 rounded-xl bg-white/70 text-pink-950 font-medium placeholder:text-pink-200"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-pink-400 to-blue-400 hover:from-pink-500 hover:to-blue-500 text-white rounded-xl font-bold py-5 shadow-md border-0 transition-transform active:scale-95 mt-2"
+              >
+                {isSignUp ? "Sign Up ✨" : "Sign In 🌸"}
+              </Button>
+            </form>
+
+            <div className="mt-5 text-center">
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-xs text-pink-600 hover:text-pink-800 font-semibold underline underline-offset-2"
+              >
+                {isSignUp ? "Already have an account? Sign In" : "Don't have an account yet? Sign Up"}
+              </button>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-pink-100/50">
+              <p className="text-[10px] text-pink-400 font-bold leading-relaxed">
+                🌸 Note: You can enter any username and password to log in. This is a secure health demonstration.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
+  // Chat Screen (IsLoggedIn === true)
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+    <div className="min-h-screen cute-gradient flex flex-col relative overflow-hidden">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-blue-100">
-        <div className="w-full px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">H</span>
+      <header className="cute-panel shadow-sm border-b border-pink-100/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="w-full max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center border border-pink-200 shadow-sm animate-pulse">
+              <span className="text-lg">🩺</span>
             </div>
-            <span className="text-xl font-semibold text-gray-900">HealthBot</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">Cute HealthBot</span>
           </div>
           
           <div className="flex items-center space-x-3">
-            <SignInDialog>
-              <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
-                Sign In
-              </Button>
-            </SignInDialog>
-            <SignUpDialog>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Sign Up
-              </Button>
-            </SignUpDialog>
+            <Button
+              variant="outline"
+              onClick={handleSignOut}
+              className="border-pink-200 text-pink-600 hover:bg-pink-50 rounded-xl hover:text-pink-700 font-bold px-4 py-2"
+            >
+              Sign Out
+            </Button>
           </div>
         </div>
       </header>
 
-      <div className="flex w-full">
-        {/* History Sidebar */}
-        <div className="w-80 bg-white border-r border-blue-100 min-h-screen shadow-sm">
-          <div className="p-4 border-b border-blue-100">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search history..."
-                value={historySearchQuery}
-                onChange={(e) => setHistorySearchQuery(e.target.value)}
-                className="pl-10 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-              />
-            </div>
-          </div>
-          
-          <div className="p-4">
-            <div className="flex items-center space-x-2 mb-4">
-              <History className="h-5 w-5 text-blue-600" />
-              <h3 className="font-semibold text-gray-900">Chat History</h3>
-            </div>
-            
-            <ScrollArea className="h-[calc(100vh-200px)]">
-              <div className="space-y-2">
-                {filteredHistory.map((item) => (
-                  <Card key={item.id} className="cursor-pointer hover:shadow-md transition-all duration-200 border-blue-100 hover:border-blue-300">
-                    <CardContent className="p-3">
-                      <h4 className="font-medium text-gray-900 text-sm mb-1">{item.title}</h4>
-                      <p className="text-xs text-gray-500 mb-2">{item.date}</p>
-                      <p className="text-xs text-gray-600 line-clamp-2">{item.preview}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
+      {/* Main Content Area */}
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 md:py-8 flex flex-col relative z-10 h-[calc(100vh-68px)]">
+        
+        {/* Hide ApiKeyManager display, but still let it mount to configure the key */}
+        <div className="hidden">
+          <ApiKeyManager onApiKeySet={setApiKey} />
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col">
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="w-full max-w-4xl">
-              <div className="text-center mb-12">
-                <h1 className="text-6xl font-bold text-gray-900 mb-4">
-                  HEALTH <span className="text-blue-600">CHATBOT</span>
-                </h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  Your AI-powered health assistant. Ask questions about symptoms, treatments, 
-                  wellness tips, and get reliable health information instantly.
-                </p>
-              </div>
-
-              <ApiKeyManager onApiKeySet={setApiKey} />
-
-              <div className="relative mb-8">
-                <div className="flex items-center space-x-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-6 w-6" />
-                    <Input
-                      placeholder="Ask me anything about your health..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleMainSearch()}
-                      className="pl-12 pr-4 py-6 text-lg border-2 border-blue-200 focus:border-blue-400 focus:ring-blue-400 rounded-xl shadow-sm"
-                    />
-                  </div>
-                  <Button
-                    onClick={handleMainSearch}
-                    disabled={!apiKey}
-                    className="px-8 py-6 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm"
-                  >
-                    Ask HealthBot
-                  </Button>
-                </div>
-              </div>
-
-              <div className="text-center mb-8">
-                <Button
-                  onClick={handleStartChat}
-                  disabled={!apiKey}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg rounded-xl shadow-sm"
-                >
-                  <MessageCircle className="h-5 w-5 mr-2" />
-                  Start Chat with HealthBot
-                </Button>
-              </div>
-
-              <div className="text-center">
-                <p className="text-gray-500 mb-4">Try asking about:</p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  {[
-                    "Common cold symptoms",
-                    "Healthy diet tips",
-                    "Exercise routines",
-                    "Sleep improvement",
-                    "Stress management",
-                    "Preventive care"
-                  ].map((suggestion) => (
-                    <Button
-                      key={suggestion}
-                      variant="outline"
-                      onClick={() => setSearchQuery(suggestion)}
-                      className="border-blue-200 text-blue-700 hover:bg-blue-50 rounded-full"
-                    >
-                      {suggestion}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-12 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800 text-center">
-                  <strong>Disclaimer:</strong> This chatbot provides general health information and is not a substitute for professional medical advice. 
-                  Always consult with a healthcare provider for medical concerns.
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="flex-1 h-full flex flex-col">
+          <ChatInterface apiKey={apiKey} />
         </div>
-      </div>
+      </main>
     </div>
   );
 };
